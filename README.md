@@ -72,13 +72,15 @@ Place the plugin directory where Gemini reads extensions, or add to your project
 
 ### OpenCode
 
-Add to your project's `opencode.json`:
-
-```json
-{ "plugin": ["path/to/draft/.opencode/plugins/draft.mjs"] }
+```bash
+npm install @cyx233/draft
 ```
 
-Or install via npm if published.
+Or add to your `opencode.json`:
+
+```json
+{ "plugin": ["@cyx233/draft"] }
+```
 
 ## Uninstall
 

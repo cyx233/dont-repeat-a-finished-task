@@ -1,8 +1,0 @@
-{
-  "name": "draft",
-  "description": "Don't Repeat A Finished Task — A caching layer for agent workflows (scripts + notes)",
-  "version": "0.3.0",
-  "author": {
-    "name": "cyx233"
-  }
-}

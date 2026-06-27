@@ -1,4 +1,3 @@
 node_modules/
-.claude/.draft-trace
-*.log
 .DS_Store
+*.log

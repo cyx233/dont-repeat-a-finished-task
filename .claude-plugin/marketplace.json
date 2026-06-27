@@ -3,18 +3,18 @@
   "name": "dont-repeat-a-finished-task",
   "description": "Don't Repeat A Finished Task — A caching layer for agent workflows (scripts + notes)",
   "owner": {
-    "name": "cyx233"
+    "name": "cyx233",
+    "url": "https://github.com/cyx233"
   },
   "plugins": [
     {
       "name": "draft",
-      "description": "A caching layer for agent workflows — scripts (actions) and notes (context)",
-      "version": "0.3.0",
-      "author": {
-        "name": "cyx233"
-      },
+      "description": "Caches repeatable agent work as scripts/notes for instant replay.",
+      "source": "./",
       "category": "productivity",
-      "source": "./plugins/draft"
+      "tags": ["caching", "workflow", "productivity", "scripts"],
+      "skills": "skills/",
+      "hooks": "hooks/copilot-hooks.json"
     }
   ]
 }
