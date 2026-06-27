@@ -5,11 +5,13 @@
 
 set -euo pipefail
 
-# TTL sweep: evict global cache entries older than 30 days (once per day)
+# TTL sweep: evict cache entries older than 30 days (once per day)
 SWEEP_MARKER="$HOME/.claude/.draft-last-sweep"
 if [[ ! -f "$SWEEP_MARKER" ]] || [[ -n "$(find "$SWEEP_MARKER" -mtime +1 2>/dev/null)" ]]; then
   find "$HOME/.claude/scripts/" -mtime +30 -type f -delete 2>/dev/null || true
   find "$HOME/.claude/notes/" -mtime +30 -type f -delete 2>/dev/null || true
+  find ".claude/scripts/" -mtime +30 -type f -delete 2>/dev/null || true
+  find ".claude/notes/" -mtime +30 -type f -delete 2>/dev/null || true
   mkdir -p "$HOME/.claude" && touch "$SWEEP_MARKER"
 fi
 
