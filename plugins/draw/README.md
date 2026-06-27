@@ -1,51 +1,39 @@
 # DRAW — DontRepeatAgentWork
 
-A Claude Code plugin that solidifies repetitive agent work into reusable bash/python scripts.
+Tokens are expensive, show me the scripts.
 
-## Problem
+## The Problem
 
-Every time an agent does a repeated task, it burns tokens re-discovering the same steps. DRAW captures that work once, then replays it at zero token cost.
+Agent does a task. Next week, same task — agent burns the same tokens re-discovering the same steps. DRAW breaks this cycle: sketch once, stroke forever.
 
-## Install
-
-**Option A: Per-session (try it out)**
-```bash
-claude --plugin-dir /path/to/draw
 ```
-
-**Option B: Persistent (shell alias)**
-```bash
-# Add to ~/.zshrc or ~/.bashrc
-alias claude='claude --plugin-dir /path/to/draw'
-```
-
-**Option C: Local marketplace (multi-plugin)**
-```bash
-# Create a directory with draw/ inside, then:
-claude plugin marketplace add /path/to/my-plugins
-claude plugin install draw
+First time:   Agent works → /draw-sketch → script saved     (one-time token cost)
+Every time after: /draw-stroke → script runs                 (zero tokens)
 ```
 
 ## Commands
 
 | Command | What it does | Token cost |
 |---------|-------------|------------|
-| `/draw-sketch` | Solidify current work into a script | One-time (agent generates) |
-| `/draw-stroke <name>` | Execute a script | Zero |
-| `/draw-gallery` | List all scripts | Zero |
-| `/draw-find <desc>` | Match scripts by description | Zero |
+| `/draw-sketch` | Solidify current work into a script | One-time |
+| `/draw-stroke <name> [params]` | Execute a saved script | Zero |
+| `/draw-gallery` | List all saved scripts | Zero |
+| `/draw-find <description>` | Search scripts by task description | Zero |
 | `/draw-erase <name>` | Delete a script | Zero |
 
-## How it works
+## Quick Start
 
-1. **Do work normally** — agent completes a task as usual
-2. **Sketch** — `/draw-sketch --name my-task` solidifies it into `.claude/scripts/my-task.sh`
-3. **Next time** — hook auto-detects matching tasks, or you run `/draw-stroke my-task`
-4. **Zero tokens** — the script runs as a subprocess, no LLM involved
+### 1. Do work as usual
 
-## Script format
+Ask the agent to do any task — add license headers, scaffold components, fix import order, whatever.
 
-Scripts live in `.claude/scripts/` (project) or `~/.claude/scripts/` (global):
+### 2. Sketch it
+
+```
+/draw-sketch --name add-license-header
+```
+
+The agent reviews what it just did in this session and generates a reusable script:
 
 ```bash
 #!/bin/bash
@@ -57,9 +45,174 @@ Scripts live in `.claude/scripts/` (project) or `~/.claude/scripts/` (global):
 # @param header_file path "Header text file" LICENSE_HEADER.txt
 
 set -euo pipefail
-# ... your logic ...
+
+FILE_PATTERN="${1:-*.ts}"
+HEADER=$(cat "${2:-LICENSE_HEADER.txt}")
+
+find src -name "$FILE_PATTERN" | while read -r f; do
+  if ! head -1 "$f" | grep -q "License"; then
+    { echo "$HEADER"; echo; cat "$f"; } > "$f.tmp" && mv "$f.tmp" "$f"
+  fi
+done
 ```
+
+### 3. Stroke it (next time)
+
+```
+/draw-stroke add-license-header "*.py" ./MIT_HEADER.txt
+```
+
+Zero tokens. Pure subprocess execution.
+
+### Sketch from a commit
+
+Don't need to sketch immediately. Come back anytime and point at a past commit:
+
+```
+/draw-sketch --commit abc123 --name fix-imports
+```
+
+The agent reads the git diff and reverse-engineers a reusable script.
 
 ## Auto-matching
 
-The `UserPromptSubmit` hook scans your prompt against `@triggers` keywords. If a strong match is found (2+ keyword hits), it suggests the script before the agent starts reasoning.
+A `UserPromptSubmit` hook runs before every agent turn. It scans your prompt against `@triggers` of all saved scripts. If 2+ keywords match, it injects a suggestion:
+
+```
+💡 Found script: add-license-header — Add license header to source files
+   Run: /draw-stroke add-license-header
+   Params:
+     file_pattern string "File glob pattern" *.ts
+     header_file path "Header text file" LICENSE_HEADER.txt
+```
+
+The agent sees this before it starts reasoning — no tokens wasted on re-discovery.
+
+## Script Format
+
+Scripts are plain bash or python with `@draw` metadata in comments:
+
+```bash
+#!/bin/bash
+# @draw
+# @name <name>
+# @description <one-line description>
+# @triggers <comma-separated keywords>
+# @param <name> <type> "<description>" [default]
+
+set -euo pipefail
+# ... script body ...
+```
+
+```python
+#!/usr/bin/env python3
+# @draw
+# @name <name>
+# @description <one-line description>
+# @triggers <comma-separated keywords>
+# @param <name> <type> "<description>" [default]
+
+import sys
+# ... script body ...
+```
+
+### Frontmatter fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `@draw` | Yes | Marks this file as a DRAW-managed script |
+| `@name` | Yes | Unique identifier (used in `/draw-stroke <name>`) |
+| `@description` | Yes | One-line summary |
+| `@triggers` | No | Comma-separated keywords for auto-matching |
+| `@param` | No | Repeatable. Format: `name type "description" [default]` |
+
+### Param types
+
+| Type | Meaning | Example |
+|------|---------|---------|
+| `string` | Any text value | `"*.ts"` |
+| `path` | File or directory path | `./src/components` |
+| `number` | Numeric value | `80` |
+| `bool` | true/false flag | `true` |
+
+Parameters with a default value are optional. Without a default, they are required.
+
+## Storage
+
+Scripts are stored as plain files:
+
+```
+.claude/scripts/      ← project-level (committed to repo)
+~/.claude/scripts/    ← global (shared across projects)
+```
+
+Both locations are scanned by `/draw-gallery`, `/draw-find`, and the auto-match hook.
+
+### Project vs Global
+
+- **Project scripts**: specific to a codebase (e.g., "add our company's license header")
+- **Global scripts**: reusable across projects (e.g., "scaffold a React component")
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ hooks/prompt-match.sh                                    │
+│   Runs on every prompt → matches @triggers → suggests   │
+│   Token cost: ZERO (pure bash)                          │
+└────────────────────────────┬────────────────────────────┘
+                             │ uses
+┌────────────────────────────▼────────────────────────────┐
+│ scripts/lib/                                             │
+│   scan.sh  — find all @draw scripts, parse frontmatter  │
+│   match.sh — keyword matching against @triggers         │
+│   Token cost: ZERO (pure bash)                          │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ commands/                                                │
+│   draw-sketch.md — agent generates script from context  │
+│   draw-stroke.md — execute script via subprocess        │
+│   draw-gallery.md — list scripts (calls scan.sh)        │
+│   draw-find.md — search scripts (calls match.sh)        │
+│   draw-erase.md — delete a script                       │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ agents/draw.md                                           │
+│   Agent type that checks for scripts before acting      │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Design Decisions
+
+### Why not Workflow scripts?
+
+Workflow scripts still call `agent()` — each call burns tokens. DRAW generates real bash/python that runs as a subprocess with zero LLM involvement.
+
+### Why bash/python over a custom DSL?
+
+- Auditable: anyone can read the script
+- Editable: no special tools needed
+- Debuggable: standard shell debugging
+- Portable: runs anywhere with bash/python
+
+### Why `@triggers` keyword matching over embeddings?
+
+- Predictable: you know exactly what will match
+- Debuggable: `grep` your triggers
+- Zero dependencies: no vector DB, no API calls
+- Fast: substring match in bash
+
+### When NOT to use DRAW
+
+- One-off tasks that won't repeat
+- Tasks requiring heavy context-dependent judgment (debugging novel bugs)
+- Tasks where input varies wildly each time
+
+## Contributing
+
+1. Fork the repo
+2. Add or modify files under `plugins/draw/`
+3. Test with `claude --plugin-dir ./plugins/draw`
+4. Submit a PR

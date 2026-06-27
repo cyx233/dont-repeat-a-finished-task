@@ -1,23 +1,23 @@
-# DRAW Marketplace
+# DRAW — DontRepeatAgentWork
 
-A Claude Code plugin marketplace containing the DRAW (DontRepeatAgentWork) plugin.
+Claude Code plugin: solidify repetitive agent work into reusable scripts.
 
-## One-line Install
+## Install
 
 ```bash
-claude plugin marketplace add github:yuxchen/draw
+claude plugin marketplace add github:cyx233/dont-repeat-agent-work
 claude plugin install draw
 ```
-
-## Plugins
-
-| Plugin | Description |
-|--------|-------------|
-| [draw](plugins/draw/) | Solidify repetitive agent work into zero-token bash/python scripts |
 
 ## Uninstall
 
 ```bash
 claude plugin uninstall draw
-claude plugin marketplace remove draw
+claude plugin marketplace remove dont-repeat-agent-work
 ```
+
+## What's inside
+
+| Plugin | Description |
+|--------|-------------|
+| [draw](plugins/draw/) | Solidify repetitive agent work into zero-token bash/python scripts |
