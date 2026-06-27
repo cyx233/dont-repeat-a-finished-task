@@ -20,14 +20,13 @@ fi
 
 parse_frontmatter() {
   local file="$1"
-  local name="" description="" triggers=""
+  local name="" description=""
 
   while IFS= read -r line; do
     case "$line" in
       "# @draw") ;;
       "# @name "*)       name="${line#\# @name }" ;;
       "# @description "*)description="${line#\# @description }" ;;
-      "# @triggers "*)   triggers="${line#\# @triggers }" ;;
       "# @param "*)      ;;
       "#!"*)             ;;
       "#"*)              ;;
@@ -36,7 +35,7 @@ parse_frontmatter() {
   done < "$file"
 
   if [[ -n "$name" ]]; then
-    printf '%s\t%s\t%s\t%s\n' "$name" "$file" "$description" "$triggers"
+    printf '%s\t%s\t%s\n' "$name" "$file" "$description"
   fi
 }
 

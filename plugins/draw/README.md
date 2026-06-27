@@ -76,17 +76,7 @@ The agent reads the git diff and reverse-engineers a reusable script.
 
 ## Auto-matching
 
-A `UserPromptSubmit` hook runs before every agent turn. It scans your prompt against `@triggers` of all saved scripts. If 2+ keywords match, it injects a suggestion:
-
-```
-💡 Found script: add-license-header — Add license header to source files
-   Run: /draw-stroke add-license-header
-   Params:
-     file_pattern string "File glob pattern" *.ts
-     header_file path "Header text file" LICENSE_HEADER.txt
-```
-
-The agent sees this before it starts reasoning — no tokens wasted on re-discovery.
+A `UserPromptSubmit` hook runs before every agent turn. It injects the full script catalog (name + description + params) into context. The agent — already an LLM — decides whether any existing script fits the task. No keyword heuristics, no scoring thresholds.
 
 ## Script Format
 
@@ -97,7 +87,6 @@ Scripts are plain bash or python with `@draw` metadata in comments:
 # @draw
 # @name <name>
 # @description <one-line description>
-# @triggers <comma-separated keywords>
 # @param <name> <type> "<description>" [default]
 
 set -euo pipefail
@@ -109,7 +98,6 @@ set -euo pipefail
 # @draw
 # @name <name>
 # @description <one-line description>
-# @triggers <comma-separated keywords>
 # @param <name> <type> "<description>" [default]
 
 import sys
@@ -123,7 +111,6 @@ import sys
 | `@draw` | Yes | Marks this file as a DRAW-managed script |
 | `@name` | Yes | Unique identifier (used in `/draw-stroke <name>`) |
 | `@description` | Yes | One-line summary |
-| `@triggers` | No | Comma-separated keywords for auto-matching |
 | `@param` | No | Repeatable. Format: `name type "description" [default]` |
 
 ### Param types
@@ -158,15 +145,13 @@ Both locations are scanned by `/draw-gallery`, `/draw-find`, and the auto-match 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ hooks/prompt-match.sh                                    │
-│   Runs on every prompt → matches @triggers → suggests   │
-│   Token cost: ZERO (pure bash)                          │
+│   Runs on every prompt → injects script catalog         │
+│   Agent decides whether to reuse (LLM-driven match)     │
 └────────────────────────────┬────────────────────────────┘
                              │ uses
 ┌────────────────────────────▼────────────────────────────┐
 │ scripts/lib/                                             │
 │   scan.sh  — find all @draw scripts, parse frontmatter  │
-│   match.sh — keyword matching against @triggers         │
-│   Token cost: ZERO (pure bash)                          │
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
@@ -174,7 +159,7 @@ Both locations are scanned by `/draw-gallery`, `/draw-find`, and the auto-match 
 │   draw-sketch.md — agent generates script from context  │
 │   draw-stroke.md — execute script via subprocess        │
 │   draw-gallery.md — list scripts (calls scan.sh)        │
-│   draw-find.md — search scripts (calls match.sh)        │
+│   draw-find.md — search scripts (agent judges relevance)│
 │   draw-erase.md — delete a script                       │
 └─────────────────────────────────────────────────────────┘
 
@@ -197,12 +182,11 @@ Workflow scripts still call `agent()` — each call burns tokens. DRAW generates
 - Debuggable: standard shell debugging
 - Portable: runs anywhere with bash/python
 
-### Why `@triggers` keyword matching over embeddings?
+### Why LLM-driven matching instead of keyword heuristics?
 
-- Predictable: you know exactly what will match
-- Debuggable: `grep` your triggers
-- Zero dependencies: no vector DB, no API calls
-- Fast: substring match in bash
+- Semantic: understands intent, not just substrings
+- Zero maintenance: no triggers to curate per script
+- Already available: the agent is an LLM, no extra API call needed
 
 ### When NOT to use DRAW
 

@@ -42,7 +42,6 @@ Write the script to `.claude/scripts/<name>.sh` (or `.py`) with this frontmatter
 # @draw
 # @name <name>
 # @description <one line description>
-# @triggers <comma-separated keywords for matching>
 # @param <name> <type> "<description>" [default]
 
 set -euo pipefail

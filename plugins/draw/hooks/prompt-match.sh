@@ -14,7 +14,7 @@ fi
 
 # Format catalog: one line per script
 CATALOG=""
-while IFS=$'\t' read -r name path description triggers; do
+while IFS=$'\t' read -r name path description; do
   PARAMS=$(grep "^# @param " "$path" 2>/dev/null | sed 's/^# @param //' || true)
   ENTRY="- $name: $description"
   if [[ -n "$PARAMS" ]]; then

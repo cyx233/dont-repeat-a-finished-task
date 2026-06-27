@@ -44,7 +44,6 @@ git log --oneline "$SAVED_HEAD"..HEAD 2>/dev/null
 # @draw
 # @name <name>
 # @description <one line description>
-# @triggers <comma-separated keywords>
 # @param <name> <type> "<description>" [default]
 
 set -euo pipefail

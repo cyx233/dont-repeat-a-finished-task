@@ -8,12 +8,15 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 
 Search for scripts that match the given description.
 
+1. Get the full script catalog:
 ```!
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/match.sh" "$ARGUMENTS"
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh"
 ```
 
-Show results ranked by relevance. For each match, show:
-- Script name and description
-- How to run it: `/draw-stroke <name> [params]`
+2. Compare the user's description against each script's name and description. Use your judgment to determine relevance — exact keyword match is not required, semantic similarity counts.
 
-If no matches, tell the user no existing script covers this task.
+3. Show results ranked by relevance. For each match, show:
+   - Script name and description
+   - How to run it: `/draw-stroke <name> [params]`
+
+4. If no scripts seem relevant, tell the user no existing script covers this task.

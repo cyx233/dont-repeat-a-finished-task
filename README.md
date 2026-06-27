@@ -39,7 +39,7 @@ claude plugin install draw
 
 ## How it works
 
-A `UserPromptSubmit` hook matches every prompt against `@triggers` of saved scripts. If a match is found, it suggests the existing script before the agent starts — reuse over reinvention.
+A `UserPromptSubmit` hook injects the full script catalog into context on every turn. The agent — already an LLM — decides whether an existing script fits the task. No keyword heuristics, no scoring thresholds, just semantic understanding.
 
 Scripts live in `.claude/scripts/` (project, committed to git) or `~/.claude/scripts/` (global). Plain bash/python — auditable, editable, portable.
 
@@ -50,7 +50,6 @@ Scripts live in `.claude/scripts/` (project, committed to git) or `~/.claude/scr
 # @draw
 # @name add-license-header
 # @description Add license header to source files
-# @triggers license header, add license, copyright
 # @param file_pattern string "File glob pattern" *.ts
 
 set -euo pipefail
@@ -62,9 +61,8 @@ Every field is human-readable. Parameters are explicit. Behavior is reviewable i
 ## Architecture
 
 ```
-hooks/prompt-match.sh        ← auto-suggests matching scripts on each prompt
+hooks/prompt-match.sh        ← injects script catalog, agent judges relevance
 scripts/lib/scan.sh          ← discovers @draw scripts, parses metadata
-scripts/lib/match.sh         ← keyword matching against @triggers
 commands/*.md                ← slash command definitions
 agents/draw.md               ← agent that checks for existing scripts first
 ```
