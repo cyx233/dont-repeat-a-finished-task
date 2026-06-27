@@ -8,18 +8,16 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(rm *)"]
 
 Delete a cached item.
 
-1. Locate as script:
+1. Locate:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find "$ARGUMENTS"
 ```
 
-2. Not found → try as note:
+2. Not found → try note:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find-note "$ARGUMENTS"
 ```
 
-3. Not found at all → tell user, exit.
-
-4. Found → show name, type, path. Confirm with user before deleting.
-
-5. `rm <path>` → confirm deletion.
+3. Not found → tell user, exit.
+4. Found → show name, type, path. Confirm before deleting.
+5. `rm <path>`

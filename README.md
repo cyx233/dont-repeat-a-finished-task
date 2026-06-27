@@ -1,44 +1,52 @@
 # DRAFT — Don't Repeat A Finished Task
 
-A caching layer for agent workflows.
-
-## The Problem: Three Storage Tiers, One Gap
-
-```
-Tier        Analogy       Lifetime        Token cost per use
------------ ------------- --------------- -------------------
-Harness     Disk          Permanent       Zero (always loaded)
-DRAFT       CPU cache     Auto-evicting   Zero (script) / Low (note)
-Memory      Registers     Per-convo       High (re-parsed, re-derived)
-```
-
-DRAFT caches two kinds of things:
-
-| Type | Caches | On hit | Example |
-|------|--------|--------|---------|
-| **Script** | An action | Zero tokens (subprocess) | "sort imports and lint" |
-| **Note** | A context | Low tokens (injected, no re-derivation) | "we're using X pattern this sprint" |
-
-Both auto-evict when cold (30-day TTL).
+A caching layer for agent workflows. Scripts (actions) and notes (context).
 
 ## How It Works
 
-- **Write**: Agent finishes a response with file changes → Stop hook triggers asyncRewake → agent silently calls `/draft-save` or `/draft-note`. Zero user noise.
-- **Read**: SessionStart injects a one-line hint when cache is non-empty. Agent uses `/draft-find` before file-changing tasks.
-- **Manual**: `/draft-save`, `/draft-note`, `/draft-run`, `/draft-recall`, `/draft-find`, `/draft-list`, `/draft-rm`
+On **SessionStart**, the plugin scans `.claude/scripts/` and `.claude/notes/`, injects the full catalog and behavioral rules into session context. The model sees what's cached and matches tasks to scripts/notes directly — no intermediate skill call needed.
+
+| Type | Caches | On hit | Storage |
+|------|--------|--------|---------|
+| **Script** | An action (bash/python) | Direct subprocess execution | `.claude/scripts/` |
+| **Note** | A context (markdown) | Read into prompt | `.claude/notes/` |
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/draft-save` | Save work as a reusable script |
+| `/draft-note` | Save context as a reusable note |
+| `/draft-rm <name>` | Delete a cached item |
+
+## Script Format
+
+Any language. Frontmatter in comments:
+
+```
+# @draft
+# @name <name>
+# @description <one-line summary>
+# @param <name> <type> "<description>" [default]
+```
+
+## Note Format
+
+```markdown
+---
+draft: note
+name: <name>
+description: <one-line summary>
+---
+
+<note content>
+```
 
 ## Install
 
 ```bash
 claude plugin marketplace add cyx233/dont-repeat-a-finished-task
 claude plugin install draft
-```
-
-## Uninstall
-
-```bash
-claude plugin uninstall draft
-claude plugin marketplace remove dont-repeat-a-finished-task
 ```
 
 ## License
