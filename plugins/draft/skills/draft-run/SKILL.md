@@ -1,12 +1,12 @@
 ---
-description: "Execute a DRAFT script by name"
+description: "Run a cached DRAFT script by name"
 argument-hint: "<script-name> [params...]"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(.claude/scripts/*)", "Bash(~/.claude/scripts/*)"]
 ---
 
-# Draft Stroke
+# Draft Run
 
-Execute an existing DRAFT script.
+Execute a cached DRAFT script.
 
 ## Steps
 
@@ -30,6 +30,11 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find "$1"
 bash "<script-path>" [params...]
 ```
 
-6. Report the result (stdout, stderr, exit code)
+6. Refresh timestamp (keeps it hot in cache):
+```!
+touch "<script-path>"
+```
 
-7. If exit code != 0, explain what went wrong and suggest fixes
+7. Report the result (stdout, stderr, exit code)
+
+8. If exit code != 0, explain what went wrong and suggest fixes

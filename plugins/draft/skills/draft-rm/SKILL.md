@@ -4,7 +4,7 @@ argument-hint: "<name>"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(rm *)"]
 ---
 
-# Draft Erase
+# Draft Rm
 
 Delete a cached item (script or note).
 

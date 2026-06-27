@@ -34,8 +34,8 @@ A caching layer for agent work. Two kinds of cache entries: **scripts**
 |-|--------|------|
 | **Caches** | An action (bash/python) | A context (markdown) |
 | **On hit** | Zero tokens — subprocess execution | Low tokens — injected into prompt |
-| **Created with** | `/draft-sketch` | `/draft-note` |
-| **Used with** | `/draft-stroke <name> [params]` | `/draft-recall <name>` |
+| **Created with** | `/draft-save` | `/draft-note` |
+| **Used with** | `/draft-run <name> [params]` | `/draft-recall <name>` |
 | **Good for** | File transforms, builds, scaffolding | Conventions, patterns, decisions |
 | **Storage** | `.claude/scripts/` | `.claude/notes/` |
 
@@ -48,17 +48,21 @@ A caching layer for agent work. Two kinds of cache entries: **scripts**
 
 ## How the Cache Works
 
-### Sketch / Note (cache write)
+### Save / Note (cache write)
 
-- `/draft-sketch` — agent distills session work into a deterministic script
+- `/draft-save` — agent distills session work into a deterministic script
 - `/draft-note` — agent captures a pattern/convention/decision as a note
 
-### Stroke / Recall (cache hit)
+Write path is human-triggered: agent may suggest saving after finishing work,
+but the user decides. This keeps the cache clean.
 
-- `/draft-stroke` — runs script as subprocess, zero LLM tokens
+### Run / Recall (cache hit)
+
+- `/draft-run` — runs script as subprocess, zero LLM tokens
 - `/draft-recall` — reads note and applies as context
 
-Each use refreshes the item's timestamp (keeps it hot).
+Read path is automatic: the hook injects the catalog, the agent matches
+semantically. Each use refreshes the item's timestamp (keeps it hot).
 
 ### Auto-eviction (TTL / LRU)
 
@@ -69,8 +73,9 @@ Items unused past TTL are evicted. Keeps the cache fresh:
 - **Promoted**: if permanently useful, move to harness — it graduates out
 
 Design intent: TTL-based eviction is the target. Current implementation
-tracks timestamps; eviction sweep will enforce configurable TTL (default: 30
-days).
+tracks timestamps via mtime; eviction sweep enforces configurable TTL
+(default: 30 days) on global items. Project-level items (committed to git)
+are not auto-evicted.
 
 ---
 
@@ -80,12 +85,12 @@ days).
 
 ```
 # Do work, then:
-/draft-sketch --name sort-imports
+/draft-save --name sort-imports
 ```
 
 Next time:
 ```
-/draft-stroke sort-imports
+/draft-run sort-imports
 ```
 
 ### 2. Cache a context
@@ -102,9 +107,9 @@ Next time the agent auto-detects the note is relevant (via the hook), or:
 ### 3. Browse the cache
 
 ```
-/draft-gallery          # list everything
+/draft-list             # list everything
 /draft-find "imports"   # semantic search
-/draft-erase old-thing  # manual eviction
+/draft-rm old-thing     # manual eviction
 ```
 
 ---
@@ -127,7 +132,7 @@ set -euo pipefail
 | Field | Required | Description |
 |-------|----------|-------------|
 | `@draft` | Yes | Marks file as DRAFT-managed |
-| `@name` | Yes | Unique identifier for `/draft-stroke <name>` |
+| `@name` | Yes | Unique identifier for `/draft-run <name>` |
 | `@description` | Yes | One-line summary, used for matching |
 | `@param` | No | Repeatable. Positional parameter declaration |
 
@@ -155,7 +160,7 @@ description: <one-line summary -- used for matching>
 ```
 
 Notes are plain markdown. Keep them short — they get injected into context on
-every match. One note = one concept.
+match. One note = one concept.
 
 ---
 
@@ -164,8 +169,8 @@ every match. One note = one concept.
 ```
 .claude/scripts/      ← cached actions (project-level, committed)
 .claude/notes/        ← cached context (project-level, committed)
-~/.claude/scripts/    ← cached actions (global, personal)
-~/.claude/notes/      ← cached context (global, personal)
+~/.claude/scripts/    ← cached actions (global, personal, auto-evictable)
+~/.claude/notes/      ← cached context (global, personal, auto-evictable)
 ```
 
 Project-level takes precedence over global when names collide.
@@ -176,11 +181,12 @@ Project-level takes precedence over global when names collide.
 
 `hooks/prompt-match.sh` runs on every prompt. It:
 
-1. Scans all four directories for scripts and notes
+1. Scans all directories for scripts and notes
 2. Parses frontmatter from each
 3. Injects the catalog into the agent's context
 
 The agent decides whether anything matches. Semantic matching, not keywords.
+Cache hit = automatic. Cache write = human-triggered.
 
 ---
 
@@ -192,9 +198,10 @@ Actions and context are fundamentally different:
 - A script replaces LLM work entirely (subprocess, deterministic)
 - A note augments LLM work (provides context, agent still reasons)
 
-Conflating them means either notes can't be rich enough (forced into
-bash-comment format) or scripts carry dead weight (markdown that never
-executes). Separate storage, separate format, unified discovery.
+### Why human-triggered writes, automatic reads?
+
+Auto-saving everything would flood the cache with one-off work. The user
+knows what repeats. The agent knows what's cached. Division of labor.
 
 ### Why bash/python for scripts?
 
@@ -202,18 +209,12 @@ Auditable, editable, debuggable, portable. No custom DSL overhead.
 
 ### Why markdown for notes?
 
-The reader is an LLM. Markdown is what it understands best. No parsing
-overhead, no format conversion.
+The reader is an LLM. Markdown is what it understands best.
 
-### Why LLM-driven matching?
+### Why LRU auto-eviction?
 
-Semantic (understands intent), zero maintenance (no triggers to curate),
-already available (the agent IS the matcher).
-
-### Why auto-eviction?
-
-Cache entries that aren't manually pruned rot. TTL makes unused items
-disappear. If something proves permanent, promote it to harness.
+Cache entries that aren't pruned rot. Temporal locality predicts future use
+better than manual curation. If something proves permanent, promote to harness.
 
 ---
 
@@ -240,20 +241,11 @@ disappear. If something proves permanent, promote it to harness.
                            v
 ┌─────────────────────────────────────────────────────┐
 │  Agent (LLM)                                         │
-│    Match script → /draft-stroke (zero tokens)        │
+│    Match script → /draft-run (zero tokens)           │
 │    Match note   → /draft-recall (inject context)     │
 │    No match     → normal work                        │
-└──────────┬──────────────────────────┬───────────────┘
-           |                          |
-           v                          v
-┌──────────────────────┐   ┌──────────────────────────┐
-│  /draft-stroke        │   │  /draft-sketch            │
-│    subprocess exec    │   │    cache action           │
-└──────────────────────┘   └──────────────────────────┘
-┌──────────────────────┐   ┌──────────────────────────┐
-│  /draft-recall        │   │  /draft-note              │
-│    inject context     │   │    cache context          │
-└──────────────────────┘   └──────────────────────────┘
+│    After work   → suggest /draft-save or /draft-note │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---

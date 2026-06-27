@@ -33,7 +33,7 @@ done <<< "$ALL_OUTPUT"
 
 MSG=""
 if [[ -n "$SCRIPTS" ]]; then
-  MSG="Available DRAFT scripts (use /draft-stroke <name> if one fits):\n$SCRIPTS"
+  MSG="Available DRAFT scripts (use /draft-run <name> if one fits):\n$SCRIPTS"
 fi
 if [[ -n "$NOTES" ]]; then
   MSG="${MSG}Available DRAFT notes (use /draft-recall <name> to inject context):\n$NOTES"

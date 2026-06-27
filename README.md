@@ -40,15 +40,13 @@ what it already proved last time.
 
 | Command | Purpose |
 |---------|---------|
-| `/draft-sketch` | Cache an action as a reusable script |
+| `/draft-save` | Cache an action as a reusable script |
 | `/draft-note` | Cache a context/pattern/convention as a note |
-| `/draft-stroke <name> [params]` | Execute a cached script (zero tokens) |
+| `/draft-run <name> [params]` | Execute a cached script (zero tokens) |
 | `/draft-recall <name>` | Load a cached note into context |
-| `/draft-gallery` | List all cached scripts and notes |
+| `/draft-list` | List all cached scripts and notes |
 | `/draft-find <desc>` | Find a cached item by task description |
-| `/draft-erase <name>` | Delete a cached item |
-| `/draft-trace-start` | Begin tracing work for auto-sketch |
-| `/draft-trace-end` | End trace, auto-generate script |
+| `/draft-rm <name>` | Delete a cached item |
 
 ## Script Format
 

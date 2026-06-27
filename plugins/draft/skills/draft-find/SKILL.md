@@ -18,6 +18,6 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --all
 3. Show results ranked by relevance. For each match, show:
    - Type (script or note)
    - Name and description
-   - How to use it: `/draft-stroke <name> [params]` for scripts, `/draft-recall <name>` for notes
+   - How to use it: `/draft-run <name> [params]` for scripts, `/draft-recall <name>` for notes
 
 4. If nothing seems relevant, tell the user no cached item covers this task.

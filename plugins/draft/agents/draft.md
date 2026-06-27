@@ -28,4 +28,4 @@ You are the DRAFT agent. Your job is to avoid repeating work that has already be
 4. If no match:
    - Tell the user: "No cached script or note for this. Proceeding normally."
    - Complete the task
-   - At the end, suggest: "Want to cache this? Run /draft-sketch (action) or /draft-note (context)"
+   - At the end, suggest: "Want to cache this? Run /draft-save (action) or /draft-note (context)"

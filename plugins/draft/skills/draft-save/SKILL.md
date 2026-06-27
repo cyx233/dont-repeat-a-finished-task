@@ -1,12 +1,12 @@
 ---
-description: "Solidify current session work into a reusable bash/python script"
+description: "Save current session work as a reusable bash/python script"
 argument-hint: "[--name <script-name>] [--commit <ref>]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
-# Draft Sketch
+# Draft Save
 
-You just helped the user complete a task. Now solidify that work into a reusable script.
+You just helped the user complete a task. Now save that work as a reusable script.
 
 ## If --commit is provided
 
