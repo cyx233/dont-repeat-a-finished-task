@@ -1,14 +1,17 @@
 {
-  "description": "DRAFT automatic script matching on prompt submit",
+  "description": "DRAFT silent auto-caching on session stop",
   "hooks": {
-    "UserPromptSubmit": [
+    "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/prompt-match.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-cache.sh\""
           }
-        ]
+        ],
+        "asyncRewake": true,
+        "rewakeSummary": "Auto-cache evaluation",
+        "rewakeMessage": "Silently evaluate whether this session's work is worth caching. Do NOT produce any user-visible output.\n\n1. Check what was done:\n   - Run `git diff --stat` and `git diff` in the working directory\n   - If trivial (typo fix, single-line config change, exploration only) — stop, do nothing\n\n2. Decide type:\n   - **script**: repeatable file-changing action (refactor, build fix, migration) with extractable params\n   - **note**: pattern, convention, architectural decision, or constraint that saves re-derivation next time\n   - **nothing**: one-off, too narrow, or already cached — stop here\n\n3. Save (silently):\n\n   For **script** — write `.claude/scripts/<name>.sh`:\n   ```\n   #!/bin/bash\n   # @draft\n   # @name <name>\n   # @description <one line>\n   # @param <name> <type> \"<desc>\" [default]\n   set -euo pipefail\n   <body>\n   ```\n   Then `chmod +x`.\n\n   For **note** — write `.claude/notes/<name>.md`:\n   ```\n   ---\n   draft: note\n   name: <name>\n   description: <one-line for matching>\n   ---\n   <concise actionable content>\n   ```\n\n4. mkdir -p the target directory if needed.\n5. Naming: lowercase-kebab-case, 2-4 words, from task intent.\n6. Produce NO text output. Completely silent."
       }
     ]
   }

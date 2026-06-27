@@ -13,6 +13,7 @@ scan_scripts() {
   local dirs=()
   [[ -d ".claude/scripts" ]] && dirs+=(".claude/scripts")
   [[ -d "$HOME/.claude/scripts" ]] && dirs+=("$HOME/.claude/scripts")
+  [[ ${#dirs[@]} -eq 0 ]] && return 0
 
   for dir in "${dirs[@]}"; do
     for file in "$dir"/*; do
@@ -28,6 +29,7 @@ scan_notes() {
   local dirs=()
   [[ -d ".claude/notes" ]] && dirs+=(".claude/notes")
   [[ -d "$HOME/.claude/notes" ]] && dirs+=("$HOME/.claude/notes")
+  [[ ${#dirs[@]} -eq 0 ]] && return 0
 
   for dir in "${dirs[@]}"; do
     for file in "$dir"/*; do
