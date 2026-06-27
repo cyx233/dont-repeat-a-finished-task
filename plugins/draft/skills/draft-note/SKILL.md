@@ -6,44 +6,34 @@ allowed-tools: ["Bash", "Read", "Write"]
 
 # Draft Note
 
-Capture a piece of reusable context (pattern, convention, decision, constraint) as a cached note.
-
-Notes differ from scripts: a script caches an **action** (zero-token subprocess on hit). A note caches **context** (injected into the agent's prompt on hit, saving re-derivation tokens).
-
-## When to use
-
-- A convention the team is following this sprint
-- An architecture pattern for the current refactoring effort
-- A decision that keeps coming up across conversations
-- Anything where the agent wastes tokens re-discovering the same knowledge
+Save a piece of reusable context as a note. Scripts cache actions; notes cache knowledge — conventions, patterns, decisions, constraints that stay stable across sessions and should be reused without re-derivation.
 
 ## Steps
 
-1. If `--name` is provided, use it. Otherwise, ask the user for a short name.
+1. If `--name` provided, use it. Otherwise ask.
 
-2. Review the conversation for the knowledge to cache. Identify:
-   - The core fact/convention/pattern
-   - Any constraints or exceptions
+2. From the conversation, extract:
+   - The core fact/pattern/convention
+   - Constraints or exceptions
    - When it applies (scope)
 
-3. Write a concise note to `.claude/notes/<name>.md` with this frontmatter:
+3. Write to `.claude/notes/<name>.md`:
 
 ```markdown
 ---
 draft: note
 name: <name>
-description: <one-line summary -- used for matching>
+description: <one-line summary — used for matching>
 ---
 
-<note content -- concise, actionable, no fluff>
+<note content — concise, actionable>
 ```
 
-4. If called interactively (user invoked /draft-note): show the note and ask if they want to edit
-5. If called silently (from auto-cache rewake): produce no output
+4. Show the note, ask if they want to edit.
 
 ## Rules
 
-- Keep notes short -- they will be injected into context on every match
-- One note = one concept. Don't bundle unrelated knowledge.
-- Use plain language. The reader is an LLM, not a human scanning docs.
-- No code blocks unless the note IS about a specific code pattern.
+- Short — injected into context on every match
+- One note = one concept
+- Plain language for LLM consumption
+- No code blocks unless the note IS about a code pattern

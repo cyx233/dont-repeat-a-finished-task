@@ -6,18 +6,17 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 
 # Draft Find
 
-Search for cached items (scripts and notes) that match the given description.
+Check if this task was already done before — a cached script can replay it, a cached note can provide the context.
 
-1. Get the full catalog:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --all
 ```
 
-2. Compare the user's description against each item's name and description. Use your judgment to determine relevance — exact keyword match is not required, semantic similarity counts.
+Match the user's description against each item's name and description (semantic similarity, not keyword-exact).
 
-3. Show results ranked by relevance. For each match, show:
-   - Type (script or note)
-   - Name and description
-   - How to use it: `/draft-run <name> [params]` for scripts, `/draft-recall <name>` for notes
+Show matches ranked by relevance:
+- Type (script / note)
+- Name and description
+- Usage: `/draft-run <name> [params]` for scripts, `/draft-recall <name>` for notes
 
-4. If nothing seems relevant, tell the user no cached item covers this task.
+No matches → say so, move on.

@@ -6,50 +6,45 @@ allowed-tools: ["Bash", "Read", "Write"]
 
 # Draft Save
 
-You just helped the user complete a task. Now save that work as a reusable script.
+Save this session's work as a reusable, controllable script. Next time the same task comes up, `/draft-run` replays it exactly — no re-derivation, no drift.
 
-## If --commit is provided
+## Source
 
-Read the git diff for that commit:
-```
-git diff $COMMIT~1..$COMMIT
-```
-Then generate a script that reproduces that change.
+- `--commit <ref>`: read `git diff $COMMIT~1..$COMMIT` and generate a script that reproduces that change.
+- Otherwise: review what was done in this conversation.
 
-## Otherwise (default: current session)
+## Extract the action
 
-Review what you did in this conversation. Identify:
-- **Core actions**: commands that produced side effects (file edits, writes, builds)
-- **Verification steps**: test/lint/build commands that validate correctness
-- **Discard**: exploration (reads, greps that didn't lead to action), false starts, retries
+Identify from the session (or diff):
+- **Side effects**: file edits, writes, installs, deploys — the actual work
+- **Verification**: test/lint/build that validated the result
+- Discard exploration, false starts, retries — only the final working path matters.
 
-## Script generation rules
+## Script rules
 
-1. Only include steps that produce side effects or verify results
-2. Collapse retries — if you edited a file 3 times, only the final state matters
-3. Extract hardcoded values as `@param` (file paths, patterns, names, text content)
-4. Choose bash unless the logic requires complex data structures (then python)
-5. Add `set -euo pipefail` for bash scripts
-6. Add guard clauses: if preconditions aren't met, `exit 1` with a clear message
-7. End with a verification step if one existed (e.g. run tests)
+1. Only side-effect and verification steps
+2. Collapse retries — only the final state matters
+3. Extract hardcoded values as `@param`
+4. Bash unless complex data structures require python
+5. `set -euo pipefail` for bash
+6. Guard clauses: preconditions not met → `exit 1` with message
+7. End with verification step if one existed
 
-## Output format
+## Output
 
-Write the script to `.claude/scripts/<name>.sh` (or `.py`) with this frontmatter:
+Write to `.claude/scripts/<name>.sh` (or `.py`):
 
 ```bash
 #!/bin/bash
 # @draft
 # @name <name>
-# @description <one line description>
+# @description <one line>
 # @param <name> <type> "<description>" [default]
 
 set -euo pipefail
 # ... script body ...
 ```
 
-## After writing
+Then `chmod +x` the file.
 
-1. Make it executable: `chmod +x .claude/scripts/<name>.sh`
-2. If called interactively (user invoked /draft-save): show the script and ask if they want to edit
-3. If called silently (from auto-cache rewake): produce no output
+Show the script to the user and ask if they want to edit.

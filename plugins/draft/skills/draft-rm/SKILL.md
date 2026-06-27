@@ -6,22 +6,20 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(rm *)"]
 
 # Draft Rm
 
-Delete a cached item (script or note).
+Delete a cached item.
 
-1. Try to locate as script:
+1. Locate as script:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find "$ARGUMENTS"
 ```
 
-2. If not found as script, try as note:
+2. Not found → try as note:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find-note "$ARGUMENTS"
 ```
 
-3. If found, show the item name, type, and path to the user
+3. Not found at all → tell user, exit.
 
-4. Confirm with the user before deleting
+4. Found → show name, type, path. Confirm with user before deleting.
 
-5. Delete: `rm <path>`
-
-6. Confirm deletion
+5. `rm <path>` → confirm deletion.

@@ -6,35 +6,29 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(.claude/scrip
 
 # Draft Run
 
-Execute a cached DRAFT script.
+Replay a cached script — exact, controllable re-execution of a previous action.
 
 ## Steps
 
-1. Parse arguments: first arg is script name, rest are params
+1. Parse arguments: first = script name, rest = params.
 
-2. Locate the script:
+2. Locate:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find "$1"
 ```
-   Search order: `.claude/scripts/` then `~/.claude/scripts/`
 
-3. If not found, show available scripts and exit
+3. Not found → list available scripts, exit.
 
-4. If found, show the user:
-   - Script name and description
-   - Required params and their defaults
-   - The command that will be executed
+4. Found → show name, description, params, and the command to execute.
 
 5. Execute:
 ```!
 bash "<script-path>" [params...]
 ```
 
-6. Refresh timestamp (keeps it hot in cache):
+6. Refresh timestamp:
 ```!
 touch "<script-path>"
 ```
 
-7. Report the result (stdout, stderr, exit code)
-
-8. If exit code != 0, explain what went wrong and suggest fixes
+7. Report result. If exit != 0, explain and suggest fixes.

@@ -6,24 +6,22 @@ allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Read"]
 
 # Draft Recall
 
-Load a cached note into context and apply it.
+Load a cached note into context — reuse stored knowledge without re-deriving it.
 
 ## Steps
 
-1. Locate the note:
+1. Locate:
 ```!
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find-note "$ARGUMENTS"
 ```
 
-2. If not found, list available notes and tell the user.
+2. Not found → list available notes, exit.
 
-3. If found, read the note file and display its content.
+3. Found → read and display the note content.
 
-4. Refresh timestamp (keeps it hot in cache):
+4. Refresh timestamp:
 ```!
 touch "<note-path>"
 ```
 
-5. Apply the note's context to the current task. The note content should guide your subsequent actions in this conversation.
-
-6. Confirm to the user which note was loaded.
+5. Apply the note's context to subsequent actions in this conversation.
