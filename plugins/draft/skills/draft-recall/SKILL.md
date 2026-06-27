@@ -19,6 +19,11 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --find-note "$ARGUMENTS"
 
 3. If found, read the note file and display its content.
 
-4. Apply the note's context to the current task. The note content should guide your subsequent actions in this conversation.
+4. Refresh timestamp (keeps it hot in cache):
+```!
+touch "<note-path>"
+```
 
-5. Confirm to the user which note was loaded.
+5. Apply the note's context to the current task. The note content should guide your subsequent actions in this conversation.
+
+6. Confirm to the user which note was loaded.
