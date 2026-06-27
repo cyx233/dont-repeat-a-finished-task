@@ -10,11 +10,7 @@
     {
       "name": "draft",
       "description": "Caches repeatable agent work as scripts/notes for instant replay.",
-      "source": "./",
-      "category": "productivity",
-      "tags": ["caching", "workflow", "productivity", "scripts"],
-      "skills": "skills/",
-      "hooks": "hooks/copilot-hooks.json"
+      "source": "./"
     }
   ]
 }
