@@ -32,10 +32,10 @@ A caching layer for agent work. Two kinds of cache entries: **scripts**
 
 ### Write (auto on Stop)
 
-When a session ends with file changes, the `Stop` hook triggers an
-`asyncRewake`. The agent silently evaluates whether the work is worth
-caching and invokes `/draft-save` (script) or `/draft-note` (note).
-User sees nothing.
+When the agent finishes a response and there are file changes, the `Stop`
+hook triggers an `asyncRewake`. The agent silently evaluates whether the
+work is worth caching and invokes `/draft-save` (script) or `/draft-note`
+(note). User sees nothing.
 
 Manual write is also available: `/draft-save` and `/draft-note`.
 

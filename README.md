@@ -23,7 +23,7 @@ Both auto-evict when cold (30-day TTL).
 
 ## How It Works
 
-- **Write**: Session ends with file changes → Stop hook triggers asyncRewake → agent silently calls `/draft-save` or `/draft-note`. Zero user noise.
+- **Write**: Agent finishes a response with file changes → Stop hook triggers asyncRewake → agent silently calls `/draft-save` or `/draft-note`. Zero user noise.
 - **Read**: SessionStart injects a one-line hint when cache is non-empty. Agent uses `/draft-find` before file-changing tasks.
 - **Manual**: `/draft-save`, `/draft-note`, `/draft-run`, `/draft-recall`, `/draft-find`, `/draft-list`, `/draft-rm`
 
