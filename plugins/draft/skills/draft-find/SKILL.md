@@ -1,10 +1,10 @@
 ---
-description: "Find a DRAW script matching a task description"
+description: "Find a DRAFT script matching a task description"
 argument-hint: "<description>"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 ---
 
-# Draw Find
+# Draft Find
 
 Search for scripts that match the given description.
 
@@ -17,6 +17,6 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh"
 
 3. Show results ranked by relevance. For each match, show:
    - Script name and description
-   - How to run it: `/draw-stroke <name> [params]`
+   - How to run it: `/draft-stroke <name> [params]`
 
 4. If no scripts seem relevant, tell the user no existing script covers this task.

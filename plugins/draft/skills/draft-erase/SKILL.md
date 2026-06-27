@@ -1,10 +1,10 @@
 ---
-description: "Delete a DRAW script"
+description: "Delete a DRAFT script"
 argument-hint: "<script-name>"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(rm *)"]
 ---
 
-# Draw Erase
+# Draft Erase
 
 Delete a solidified script.
 

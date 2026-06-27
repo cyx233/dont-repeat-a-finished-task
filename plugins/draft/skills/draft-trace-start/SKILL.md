@@ -4,7 +4,7 @@ argument-hint: "[--name <script-name>]"
 allowed-tools: ["Bash"]
 ---
 
-# Draw Trace Start
+# Draft Trace Start
 
 Mark the beginning of a traceable work segment.
 
@@ -14,7 +14,7 @@ Mark the beginning of a traceable work segment.
 
 2. Capture current state:
 ```!
-mkdir -p .claude && cat <<EOF > .claude/.draw-trace
+mkdir -p .claude && cat <<EOF > .claude/.draft-trace
 name=${NAME:-}
 head=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
 timestamp=$(date +%s)
@@ -22,5 +22,5 @@ EOF
 ```
 
 3. Confirm to user:
-   - "Trace started. Do your work, then run `/draw-trace-end` to auto-sketch."
+   - "Trace started. Do your work, then run `/draft-trace-end` to auto-sketch."
    - If `--name` was given, mention it will be used as the script name.

@@ -1,8 +1,0 @@
-{
-  "name": "draw",
-  "description": "DontRepeatAgentWork — Solidify agent work into auditable, controllable, reusable scripts",
-  "version": "0.2.0",
-  "author": {
-    "name": "cyx233"
-  }
-}

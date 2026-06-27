@@ -1,7 +1,7 @@
 #!/bin/bash
-# Scan .claude/scripts/ directories for @draw scripts
+# Scan .claude/scripts/ directories for @draft scripts
 # Usage:
-#   scan.sh              — list all scripts (tab-separated: name, path, description, triggers)
+#   scan.sh              — list all scripts (tab-separated: name, path, description)
 #   scan.sh --find NAME  — find a script by name, print its path
 
 set -euo pipefail
@@ -24,7 +24,7 @@ parse_frontmatter() {
 
   while IFS= read -r line; do
     case "$line" in
-      "# @draw") ;;
+      "# @draft") ;;
       "# @name "*)       name="${line#\# @name }" ;;
       "# @description "*)description="${line#\# @description }" ;;
       "# @param "*)      ;;
@@ -50,7 +50,7 @@ fi
 for dir in "${SCRIPT_DIRS[@]}"; do
   for file in "$dir"/*; do
     [[ -f "$file" ]] || continue
-    if head -5 "$file" | grep -q "@draw"; then
+    if head -5 "$file" | grep -q "@draft"; then
       if [[ "$MODE" == "find" ]]; then
         name=$(head -20 "$file" | grep "^# @name " | head -1 | sed 's/^# @name //')
         if [[ "$name" == "$FIND_NAME" ]]; then

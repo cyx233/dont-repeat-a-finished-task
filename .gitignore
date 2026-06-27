@@ -1,4 +1,4 @@
 node_modules/
-.claude/.draw-trace
+.claude/.draft-trace
 *.log
 .DS_Store

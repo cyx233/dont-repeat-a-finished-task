@@ -1,12 +1,12 @@
 ---
-description: "Execute a DRAW script by name"
+description: "Execute a DRAFT script by name"
 argument-hint: "<script-name> [params...]"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(.claude/scripts/*)", "Bash(~/.claude/scripts/*)"]
 ---
 
-# Draw Stroke
+# Draft Stroke
 
-Execute an existing DRAW script.
+Execute an existing DRAFT script.
 
 ## Steps
 

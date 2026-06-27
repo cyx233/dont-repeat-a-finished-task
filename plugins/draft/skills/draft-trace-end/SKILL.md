@@ -4,7 +4,7 @@ argument-hint: "[--name <script-name>]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
-# Draw Trace End
+# Draft Trace End
 
 End the trace, diff everything since trace-start, and generate a reusable script.
 
@@ -12,9 +12,9 @@ End the trace, diff everything since trace-start, and generate a reusable script
 
 1. Read the marker file:
 ```!
-cat .claude/.draw-trace
+cat .claude/.draft-trace
 ```
-   If missing, tell the user: "No active trace. Run `/draw-trace-start` first."
+   If missing, tell the user: "No active trace. Run `/draft-trace-start` first."
 
 2. Determine the script name:
    - Use `--name` from this command's arguments if provided
@@ -41,7 +41,7 @@ git log --oneline "$SAVED_HEAD"..HEAD 2>/dev/null
 6. Write the script to `.claude/scripts/<name>.sh` (or `.py`):
 ```bash
 #!/bin/bash
-# @draw
+# @draft
 # @name <name>
 # @description <one line description>
 # @param <name> <type> "<description>" [default]
@@ -57,7 +57,7 @@ chmod +x .claude/scripts/<name>.sh
 
 8. Clean up marker:
 ```!
-rm .claude/.draw-trace
+rm .claude/.draft-trace
 ```
 
 9. Show the generated script and ask if the user wants to edit anything.

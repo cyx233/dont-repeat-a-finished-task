@@ -4,7 +4,7 @@ argument-hint: "[--name <script-name>] [--commit <ref>]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
-# Draw Sketch
+# Draft Sketch
 
 You just helped the user complete a task. Now solidify that work into a reusable script.
 
@@ -39,7 +39,7 @@ Write the script to `.claude/scripts/<name>.sh` (or `.py`) with this frontmatter
 
 ```bash
 #!/bin/bash
-# @draw
+# @draft
 # @name <name>
 # @description <one line description>
 # @param <name> <type> "<description>" [default]

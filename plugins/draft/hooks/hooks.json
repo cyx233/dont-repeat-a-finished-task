@@ -1,5 +1,5 @@
 {
-  "description": "DRAW automatic script matching on prompt submit",
+  "description": "DRAFT automatic script matching on prompt submit",
   "hooks": {
     "UserPromptSubmit": [
       {

@@ -1,7 +1,7 @@
 {
-  "name": "@cyx233/draw",
+  "name": "@cyx233/draft",
   "version": "0.2.0",
-  "description": "DontRepeatAgentWork — Solidify agent work into auditable, controllable, reusable scripts",
+  "description": "DontRepeatAFinishedTask — Solidify agent work into auditable, controllable, reusable scripts",
   "keywords": [
     "claude-code-plugin",
     "ai-agent",
@@ -13,9 +13,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cyx233/dont-repeat-agent-work.git"
+    "url": "git+https://github.com/cyx233/dont-repeat-a-finished-task.git"
   },
-  "homepage": "https://github.com/cyx233/dont-repeat-agent-work",
+  "homepage": "https://github.com/cyx233/dont-repeat-a-finished-task",
   "files": [
     "plugins/",
     "LICENSE",

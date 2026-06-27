@@ -1,20 +1,20 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "dont-repeat-agent-work",
+  "name": "dont-repeat-a-finished-task",
   "description": "Claude Code plugin: solidify agent work into auditable, controllable, reusable scripts",
   "owner": {
     "name": "cyx233"
   },
   "plugins": [
     {
-      "name": "draw",
+      "name": "draft",
       "description": "Solidify agent work into auditable, controllable, reusable scripts",
       "version": "0.2.0",
       "author": {
         "name": "cyx233"
       },
       "category": "productivity",
-      "source": "./plugins/draw"
+      "source": "./plugins/draft"
     }
   ]
 }

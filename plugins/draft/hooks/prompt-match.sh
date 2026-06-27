@@ -1,6 +1,6 @@
 #!/bin/bash
 # Hook: UserPromptSubmit
-# Injects available @draw script catalog into context.
+# Injects available @draft script catalog into context.
 # The agent (already an LLM) decides whether to reuse a script.
 
 set -euo pipefail
@@ -23,6 +23,6 @@ while IFS=$'\t' read -r name path description; do
   CATALOG="$CATALOG$ENTRY\n"
 done <<< "$SCAN_OUTPUT"
 
-MSG="Available DRAW scripts (use /draw-stroke <name> if one fits the task):\n$CATALOG"
+MSG="Available DRAFT scripts (use /draft-stroke <name> if one fits the task):\n$CATALOG"
 
 jq -n --arg msg "$(printf "$MSG")" '{"systemMessage": $msg}'
