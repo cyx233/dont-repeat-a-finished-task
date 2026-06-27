@@ -1,12 +1,72 @@
 # DRAW — DontRepeatAgentWork
 
-Claude Code plugin: solidify repetitive agent work into reusable scripts.
+Claude Code plugin: solidify agent work into auditable, controllable, reusable scripts.
+
+Agent output is non-deterministic. DRAW captures proven solutions as plain bash/python — you can read every line, version it in git, tune parameters, and rerun with confidence.
+
+```
+First time:    Agent works → /draw-sketch → script saved
+Every time:    /draw-stroke → deterministic execution, same result every run
+```
+
+## Why
+
+| Problem | DRAW's answer |
+|---------|---------------|
+| Agent output is a black box | Scripts are plain text — auditable by anyone |
+| Re-running a prompt may give different results | Scripts are deterministic — same input, same output |
+| Hard to enforce team standards via prompts | Scripts encode the exact steps — controllable and reviewable in PR |
+| Good solutions get lost in chat history | Scripts persist in git — reusable across sessions, teammates, CI |
 
 ## Install
 
 ```bash
 claude plugin marketplace add github:cyx233/dont-repeat-agent-work
 claude plugin install draw
+```
+
+## Commands
+
+| Command | What it does |
+|---------|-------------|
+| `/draw-sketch` | Solidify current work into a reusable script |
+| `/draw-stroke <name> [params]` | Execute a saved script deterministically |
+| `/draw-gallery` | List all saved scripts |
+| `/draw-find <desc>` | Search scripts by task description |
+| `/draw-erase <name>` | Delete a script |
+| `/draw-trace-start` | Begin tracing work for auto-sketch |
+| `/draw-trace-end` | End trace and generate script from changes |
+
+## How it works
+
+A `UserPromptSubmit` hook matches every prompt against `@triggers` of saved scripts. If a match is found, it suggests the existing script before the agent starts — reuse over reinvention.
+
+Scripts live in `.claude/scripts/` (project, committed to git) or `~/.claude/scripts/` (global). Plain bash/python — auditable, editable, portable.
+
+## Script format
+
+```bash
+#!/bin/bash
+# @draw
+# @name add-license-header
+# @description Add license header to source files
+# @triggers license header, add license, copyright
+# @param file_pattern string "File glob pattern" *.ts
+
+set -euo pipefail
+# ... deterministic steps, no LLM involved ...
+```
+
+Every field is human-readable. Parameters are explicit. Behavior is reviewable in a diff.
+
+## Architecture
+
+```
+hooks/prompt-match.sh        ← auto-suggests matching scripts on each prompt
+scripts/lib/scan.sh          ← discovers @draw scripts, parses metadata
+scripts/lib/match.sh         ← keyword matching against @triggers
+commands/*.md                ← slash command definitions
+agents/draw.md               ← agent that checks for existing scripts first
 ```
 
 ## Uninstall
@@ -16,8 +76,6 @@ claude plugin uninstall draw
 claude plugin marketplace remove dont-repeat-agent-work
 ```
 
-## What's inside
+## License
 
-| Plugin | Description |
-|--------|-------------|
-| [draw](plugins/draw/) | Solidify repetitive agent work into zero-token bash/python scripts |
+MIT

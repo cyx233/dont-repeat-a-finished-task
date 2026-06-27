@@ -1,46 +1,28 @@
 #!/bin/bash
 # Hook: UserPromptSubmit
-# Reads user prompt from stdin, matches against @draw scripts
-# If match found, injects a system message suggesting the script
+# Injects available @draw script catalog into context.
+# The agent (already an LLM) decides whether to reuse a script.
 
 set -euo pipefail
 
-HOOK_INPUT=$(cat)
-PROMPT=$(echo "$HOOK_INPUT" | jq -r '.prompt // ""')
-
-if [[ -z "$PROMPT" ]]; then
-  exit 0
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-MATCH_OUTPUT=$("$SCRIPT_DIR/../scripts/lib/match.sh" "$PROMPT" 2>/dev/null || true)
+SCAN_OUTPUT=$("$SCRIPT_DIR/../scripts/lib/scan.sh" 2>/dev/null || true)
 
-if [[ -z "$MATCH_OUTPUT" ]]; then
+if [[ -z "$SCAN_OUTPUT" ]]; then
   exit 0
 fi
 
-# Take the top match
-TOP=$(echo "$MATCH_OUTPUT" | head -1)
-SCORE=$(echo "$TOP" | cut -f1)
-NAME=$(echo "$TOP" | cut -f2)
-PATH_=$(echo "$TOP" | cut -f3)
-DESC=$(echo "$TOP" | cut -f4)
+# Format catalog: one line per script
+CATALOG=""
+while IFS=$'\t' read -r name path description triggers; do
+  PARAMS=$(grep "^# @param " "$path" 2>/dev/null | sed 's/^# @param //' || true)
+  ENTRY="- $name: $description"
+  if [[ -n "$PARAMS" ]]; then
+    ENTRY="$ENTRY (params: $PARAMS)"
+  fi
+  CATALOG="$CATALOG$ENTRY\n"
+done <<< "$SCAN_OUTPUT"
 
-# Only suggest if score >= 2 (at least 2 keyword hits)
-if [[ "$SCORE" -lt 2 ]]; then
-  exit 0
-fi
+MSG="Available DRAW scripts (use /draw-stroke <name> if one fits the task):\n$CATALOG"
 
-# Extract params from the script
-PARAMS=$(grep "^# @param " "$PATH_" 2>/dev/null | sed 's/^# @param /  /' || true)
-
-MSG="Found existing script: $NAME"
-if [[ -n "$DESC" ]]; then
-  MSG="$MSG — $DESC"
-fi
-MSG="$MSG\nRun: /draw-stroke $NAME"
-if [[ -n "$PARAMS" ]]; then
-  MSG="$MSG\nParams:\n$PARAMS"
-fi
-
-jq -n --arg msg "$MSG" '{"systemMessage": $msg}'
+jq -n --arg msg "$(printf "$MSG")" '{"systemMessage": $msg}'

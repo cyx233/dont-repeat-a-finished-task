@@ -1,0 +1,24 @@
+{
+  "name": "@cyx233/draw",
+  "version": "0.2.0",
+  "description": "DontRepeatAgentWork — Solidify agent work into auditable, controllable, reusable scripts",
+  "keywords": [
+    "claude-code-plugin",
+    "ai-agent",
+    "productivity",
+    "automation",
+    "scripts"
+  ],
+  "author": "cyx233",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyx233/dont-repeat-agent-work.git"
+  },
+  "homepage": "https://github.com/cyx233/dont-repeat-agent-work",
+  "files": [
+    "plugins/",
+    "LICENSE",
+    "README.md"
+  ]
+}

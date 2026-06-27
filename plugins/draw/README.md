@@ -1,10 +1,10 @@
 # DRAW — DontRepeatAgentWork
 
-Tokens are expensive, show me the scripts.
+Agent output is non-deterministic. Scripts are not.
 
 ## The Problem
 
-Agent does a task. Next week, same task — agent burns the same tokens re-discovering the same steps. DRAW breaks this cycle: sketch once, stroke forever.
+Agent does a task. Next week, same task — you get a different result. No audit trail, no version control, no guarantee it does the same thing. DRAW breaks this: sketch once, stroke deterministically forever.
 
 ```
 First time:   Agent works → /draw-sketch → script saved     (one-time token cost)

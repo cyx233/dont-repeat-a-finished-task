@@ -1,14 +1,15 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "dont-repeat-agent-work",
-  "description": "Claude Code plugin: solidify repetitive agent work into reusable scripts",
+  "description": "Claude Code plugin: solidify agent work into auditable, controllable, reusable scripts",
   "owner": {
     "name": "cyx233"
   },
   "plugins": [
     {
       "name": "draw",
-      "description": "Solidify repetitive agent work into zero-token bash/python scripts",
+      "description": "Solidify agent work into auditable, controllable, reusable scripts",
+      "version": "0.2.0",
       "author": {
         "name": "cyx233"
       },
