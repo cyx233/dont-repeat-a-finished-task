@@ -1,22 +1,23 @@
 ---
-description: "Find a DRAFT script matching a task description"
+description: "Find a cached DRAFT script or note matching a task description"
 argument-hint: "<description>"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 ---
 
 # Draft Find
 
-Search for scripts that match the given description.
+Search for cached items (scripts and notes) that match the given description.
 
-1. Get the full script catalog:
+1. Get the full catalog:
 ```!
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --all
 ```
 
-2. Compare the user's description against each script's name and description. Use your judgment to determine relevance — exact keyword match is not required, semantic similarity counts.
+2. Compare the user's description against each item's name and description. Use your judgment to determine relevance — exact keyword match is not required, semantic similarity counts.
 
 3. Show results ranked by relevance. For each match, show:
-   - Script name and description
-   - How to run it: `/draft-stroke <name> [params]`
+   - Type (script or note)
+   - Name and description
+   - How to use it: `/draft-stroke <name> [params]` for scripts, `/draft-recall <name>` for notes
 
-4. If no scripts seem relevant, tell the user no existing script covers this task.
+4. If nothing seems relevant, tell the user no cached item covers this task.

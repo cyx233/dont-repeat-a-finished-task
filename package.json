@@ -1,7 +1,7 @@
 {
   "name": "@cyx233/draft",
-  "version": "0.2.0",
-  "description": "DontRepeatAFinishedTask — Solidify agent work into auditable, controllable, reusable scripts",
+  "version": "0.3.0",
+  "description": "Don't Repeat A Finished Task — A caching layer for agent workflows (scripts + notes)",
   "keywords": [
     "claude-code-plugin",
     "ai-agent",

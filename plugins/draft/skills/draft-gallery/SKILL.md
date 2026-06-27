@@ -1,21 +1,28 @@
 ---
-description: "List all available DRAFT scripts"
+description: "List all cached DRAFT scripts and notes"
 argument-hint: ""
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 ---
 
 # Draft Gallery
 
-List all solidified scripts.
+List all cached items (scripts and notes).
 
 ```!
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.sh" --all
 ```
 
-Format the output as a table for the user:
+Format the output as two tables:
+
+**Scripts** (actions — zero-token execution via /draft-stroke):
 
 | Name | Description | Params |
 |------|-------------|--------|
 
-If no scripts found, tell the user:
-- No scripts yet. Use `/draft-sketch` after completing a task to solidify it.
+**Notes** (context — injected on recall via /draft-recall):
+
+| Name | Description |
+|------|-------------|
+
+If nothing found, tell the user:
+- No cached items yet. Use `/draft-sketch` (action) or `/draft-note` (context) to cache work.

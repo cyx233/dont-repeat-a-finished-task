@@ -1,10 +1,8 @@
-# DRAFT -- DontRepeatAFinishedTask
+# DRAFT — Don't Repeat A Finished Task
 
 A caching layer for agent workflows.
 
 ## The Problem: Three Storage Tiers, One Gap
-
-Agent workflows have two storage extremes:
 
 ```
 Tier        Analogy       Lifetime        Token cost per use
@@ -14,13 +12,9 @@ Memory      Registers     Per-convo       High (re-parsed, re-derived)
 ```
 
 Harness (CLAUDE.md, hooks, settings) is permanent but expensive to
-add/remove -- you only put things there that are truly forever. Memory
-(.claude/memory/) is ephemeral -- recalled per-conversation, costs tokens to
-re-parse and re-execute every time.
-
-The gap: patterns that repeat frequently over days or weeks but are not
-permanent enough for harness. Too expensive to re-derive from memory each
-session. Too transient to hardcode.
+add/remove. Memory (.claude/memory/) is ephemeral — costs tokens to re-parse
+every conversation. The gap: patterns that repeat over days/weeks but aren't
+permanent enough for harness. Too expensive to re-derive from memory each time.
 
 ## DRAFT: The Missing Middle
 
@@ -28,39 +22,35 @@ session. Too transient to hardcode.
 Tier        Analogy       Lifetime        Token cost per use
 ----------- ------------- --------------- -------------------
 Harness     Disk          Permanent       Zero
-DRAFT       CPU cache     Auto-evicting   Zero (subprocess)
+DRAFT       CPU cache     Auto-evicting   Zero (script) / Low (note)
 Memory      Registers     Per-convo       High
 ```
 
-DRAFT is an LRU cache for proven agent work:
+DRAFT caches two kinds of things:
 
-- **Cache write** (`/draft-sketch`): agent solves a task, solution is captured
-  as a deterministic bash/python script
-- **Cache hit** (`/draft-stroke`): script runs as a subprocess -- zero LLM
-  tokens, instant, deterministic
-- **Cache eviction**: unused scripts silently expire past TTL -- no manual
-  cleanup, no rot
-- **Hot path**: each stroke refreshes the timestamp, keeping active scripts alive
-- **Promotion**: if a script proves permanently useful, move it to harness
-- **Demotion**: if it stops being used, it disappears on its own
+| Type | Caches | On hit | Example |
+|------|--------|--------|---------|
+| **Script** | An action | Zero tokens (subprocess) | "sort imports and lint" |
+| **Note** | A context | Low tokens (injected, no re-derivation) | "we're using X pattern this sprint" |
 
-Cache hit = zero tokens. Cache miss = normal agent work.
+Both auto-evict when cold (LRU/TTL). Both save the agent from re-deriving
+what it already proved last time.
 
 ## Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/draft-sketch` | Capture current work as a reusable script (cache write) |
-| `/draft-stroke <name> [params]` | Execute a saved script (cache hit) |
-| `/draft-gallery` | List all cached scripts |
-| `/draft-find <desc>` | Find a script by task description |
-| `/draft-erase <name>` | Delete a script manually |
+| `/draft-sketch` | Cache an action as a reusable script |
+| `/draft-note` | Cache a context/pattern/convention as a note |
+| `/draft-stroke <name> [params]` | Execute a cached script (zero tokens) |
+| `/draft-recall <name>` | Load a cached note into context |
+| `/draft-gallery` | List all cached scripts and notes |
+| `/draft-find <desc>` | Find a cached item by task description |
+| `/draft-erase <name>` | Delete a cached item |
 | `/draft-trace-start` | Begin tracing work for auto-sketch |
-| `/draft-trace-end` | End trace, auto-generate script from recorded work |
+| `/draft-trace-end` | End trace, auto-generate script |
 
 ## Script Format
-
-Plain bash or python with `@draft` metadata:
 
 ```bash
 #!/bin/bash
@@ -70,21 +60,34 @@ Plain bash or python with `@draft` metadata:
 # @param file_pattern string "File glob pattern" *.ts
 
 set -euo pipefail
-# ... deterministic steps, no LLM involved ...
+# ...
 ```
 
-Human-readable. Parameters explicit. Diffable. No magic.
+## Note Format
+
+```markdown
+---
+draft: note
+name: migration-pattern
+description: Current module migration convention (Q1 2025)
+---
+
+All new modules use barrel exports. Import paths change from
+@app/module/internal to @app/module. Update both source and test files.
+```
 
 ## Architecture
 
 ```
-hooks/prompt-match.sh        Injects script catalog; agent judges relevance
-scripts/lib/scan.sh          Discovers @draft scripts, parses metadata
+hooks/prompt-match.sh        Injects script + note catalog; agent judges relevance
+scripts/lib/scan.sh          Discovers @draft scripts and notes, parses metadata
 skills/*/SKILL.md            Slash command definitions
 agents/draft.md              Agent that checks cache before doing work
 ```
 
-Scripts live in `.claude/scripts/` (project) or `~/.claude/scripts/` (global).
+Storage:
+- `.claude/scripts/` — cached actions (project or global)
+- `.claude/notes/` — cached context (project or global)
 
 ## Install
 

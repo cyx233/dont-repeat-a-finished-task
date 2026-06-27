@@ -1,15 +1,15 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "dont-repeat-a-finished-task",
-  "description": "Claude Code plugin: solidify agent work into auditable, controllable, reusable scripts",
+  "description": "Don't Repeat A Finished Task — A caching layer for agent workflows (scripts + notes)",
   "owner": {
     "name": "cyx233"
   },
   "plugins": [
     {
       "name": "draft",
-      "description": "Solidify agent work into auditable, controllable, reusable scripts",
-      "version": "0.2.0",
+      "description": "A caching layer for agent workflows — scripts (actions) and notes (context)",
+      "version": "0.3.0",
       "author": {
         "name": "cyx233"
       },

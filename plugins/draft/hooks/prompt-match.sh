@@ -1,28 +1,46 @@
 #!/bin/bash
 # Hook: UserPromptSubmit
-# Injects available @draft script catalog into context.
-# The agent (already an LLM) decides whether to reuse a script.
+# Injects available @draft scripts and notes catalog into context.
+# The agent (already an LLM) decides whether to reuse.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SCAN_OUTPUT=$("$SCRIPT_DIR/../scripts/lib/scan.sh" 2>/dev/null || true)
+ALL_OUTPUT=$("$SCRIPT_DIR/../scripts/lib/scan.sh" --all 2>/dev/null || true)
 
-if [[ -z "$SCAN_OUTPUT" ]]; then
+if [[ -z "$ALL_OUTPUT" ]]; then
   exit 0
 fi
 
-# Format catalog: one line per script
-CATALOG=""
-while IFS=$'\t' read -r name path description; do
-  PARAMS=$(grep "^# @param " "$path" 2>/dev/null | sed 's/^# @param //' || true)
-  ENTRY="- $name: $description"
-  if [[ -n "$PARAMS" ]]; then
-    ENTRY="$ENTRY (params: $PARAMS)"
-  fi
-  CATALOG="$CATALOG$ENTRY\n"
-done <<< "$SCAN_OUTPUT"
+SCRIPTS=""
+NOTES=""
 
-MSG="Available DRAFT scripts (use /draft-stroke <name> if one fits the task):\n$CATALOG"
+while IFS=$'\t' read -r type name path description; do
+  case "$type" in
+    script)
+      PARAMS=$(grep "^# @param " "$path" 2>/dev/null | sed 's/^# @param //' || true)
+      ENTRY="- $name: $description"
+      if [[ -n "$PARAMS" ]]; then
+        ENTRY="$ENTRY (params: $PARAMS)"
+      fi
+      SCRIPTS="$SCRIPTS$ENTRY\n"
+      ;;
+    note)
+      NOTES="$NOTES- $name: $description\n"
+      ;;
+  esac
+done <<< "$ALL_OUTPUT"
+
+MSG=""
+if [[ -n "$SCRIPTS" ]]; then
+  MSG="Available DRAFT scripts (use /draft-stroke <name> if one fits):\n$SCRIPTS"
+fi
+if [[ -n "$NOTES" ]]; then
+  MSG="${MSG}Available DRAFT notes (use /draft-recall <name> to inject context):\n$NOTES"
+fi
+
+if [[ -z "$MSG" ]]; then
+  exit 0
+fi
 
 jq -n --arg msg "$(printf "$MSG")" '{"systemMessage": $msg}'
