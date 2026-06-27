@@ -90,7 +90,7 @@ Storage:
 ## Install
 
 ```bash
-claude plugin marketplace add github:cyx233/dont-repeat-a-finished-task
+claude plugin marketplace add cyx233/dont-repeat-a-finished-task
 claude plugin install draft
 ```
 
