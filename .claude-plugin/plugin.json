@@ -1,0 +1,8 @@
+{
+  "name": "draw",
+  "description": "DontRepeatAgentWork — Solidify repetitive agent work into zero-token bash/python scripts",
+  "version": "0.1.0",
+  "author": {
+    "name": "yuxchen"
+  }
+}
