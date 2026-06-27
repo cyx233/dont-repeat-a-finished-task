@@ -1,6 +1,6 @@
 ---
 name: draft
-description: Checks for cached scripts and notes before doing work. Use when a task might already be cached.
+description: "Checks for cached scripts and notes before doing work. Use BEFORE starting any file-changing task (refactor, migration, build fix, lint fix, deploy, config change) to avoid repeating finished work. Also use when the user says \"didn't we do this before\", \"same as last time\", \"reuse\", or describes a task that sounds repetitive."
 tools: Bash, Read
 model: sonnet
 ---

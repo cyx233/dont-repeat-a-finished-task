@@ -1,5 +1,5 @@
 ---
-description: "Find a cached DRAFT script or note matching a task description"
+description: "Find a cached DRAFT script or note matching a task description. Use BEFORE starting any file-changing task (refactor, migration, build fix, lint fix, deploy, config change) to check if it was already done before. Also use when the user says \"didn't we do this before\", \"same as last time\", \"reuse\", or describes a task that sounds like a past session."
 argument-hint: "<description>"
 allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)"]
 ---
