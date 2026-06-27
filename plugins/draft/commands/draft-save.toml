@@ -1,0 +1,2 @@
+description = "Save current session work as a reusable script"
+prompt = "Save this session's work as a reusable script. Extract side effects only (file edits, writes, installs). Hardcoded values become @param. Write to .claude/scripts/<name>.<ext> with @draft frontmatter."

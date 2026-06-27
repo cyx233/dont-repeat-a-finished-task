@@ -1,0 +1,12 @@
+{
+  "name": "draft",
+  "version": "0.3.0",
+  "description": "Don't Repeat A Finished Task — caching layer for agent workflows (scripts + notes)",
+  "author": {
+    "name": "cyx233"
+  },
+  "homepage": "https://github.com/cyx233/dont-repeat-a-finished-task",
+  "repository": "https://github.com/cyx233/dont-repeat-a-finished-task",
+  "license": "MIT",
+  "keywords": ["caching", "workflow", "productivity"]
+}

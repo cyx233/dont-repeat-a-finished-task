@@ -1,0 +1,15 @@
+{
+  "name": "draft",
+  "description": "Don't Repeat A Finished Task — caching layer for agent workflows (scripts + notes)",
+  "version": "0.3.0",
+  "author": {
+    "name": "cyx233",
+    "url": "https://github.com/cyx233"
+  },
+  "homepage": "https://github.com/cyx233/dont-repeat-a-finished-task",
+  "repository": "https://github.com/cyx233/dont-repeat-a-finished-task",
+  "license": "MIT",
+  "keywords": ["caching", "workflow", "productivity"],
+  "skills": "skills/",
+  "hooks": "hooks/copilot-hooks.json"
+}

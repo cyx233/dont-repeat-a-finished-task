@@ -5,11 +5,11 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-const scanScript = path.join(__dirname, '..', 'scripts', 'lib', 'scan.sh');
+const scanScript = path.join(__dirname, '..', 'scripts', 'lib', 'scan.js');
 
 let catalog = '';
 try {
-  catalog = execSync(`bash "${scanScript}" --all`, {
+  catalog = execSync(`node "${scanScript}" --all`, {
     encoding: 'utf8',
     timeout: 3000,
     cwd: process.env.CLAUDE_CWD || process.cwd(),
@@ -24,7 +24,7 @@ if (!catalog) {
     'DRAFT plugin is active. No cached scripts or notes yet.',
     'After completing a repeatable file-changing task, offer to run /draft-save.',
   ].join('\n');
-  process.stdout.write(rules);
+  emit(rules);
   process.exit(0);
 }
 
@@ -72,4 +72,20 @@ output += `
 3. After completing a repeatable file-changing task that has no cached script, offer to run /draft-save.
 4. Do NOT re-derive work that a cached script already handles.`;
 
-process.stdout.write(output);
+emit(output);
+
+// ponytail: runtime detection — adapts output format per host environment
+function emit(text) {
+  if (process.env.COPILOT_PLUGIN_DATA) {
+    process.stdout.write(JSON.stringify({ additionalContext: text }));
+  } else if (process.env.PLUGIN_DATA) {
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: text,
+      },
+    }));
+  } else {
+    process.stdout.write(text);
+  }
+}

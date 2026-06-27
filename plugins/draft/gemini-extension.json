@@ -1,0 +1,6 @@
+{
+  "name": "draft",
+  "version": "0.3.0",
+  "description": "Don't Repeat A Finished Task — caching layer for agent workflows (scripts + notes)",
+  "contextFileName": "AGENTS.md"
+}

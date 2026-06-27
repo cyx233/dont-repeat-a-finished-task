@@ -1,0 +1,2 @@
+description = "Save context as a reusable note"
+prompt = "Save reusable context as a note. Extract the core fact, constraints, scope. Write to .claude/notes/<name>.md with draft: note frontmatter. One note = one concept."

@@ -1,0 +1,2 @@
+description = "Delete a cached draft script or note"
+prompt = "Delete a cached draft item. Search for it by name in .claude/scripts/ and .claude/notes/, confirm before deleting. {{args}}"
