@@ -13,10 +13,7 @@
         "name": "cyx233"
       },
       "category": "productivity",
-      "source": {
-        "source": "local",
-        "path": "plugins/draw"
-      }
+      "source": "./plugins/draw"
     }
   ]
 }
