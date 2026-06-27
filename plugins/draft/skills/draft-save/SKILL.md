@@ -50,6 +50,6 @@ set -euo pipefail
 
 ## After writing
 
-1. Show the user the generated script
-2. Ask if they want to edit anything (params, triggers, logic)
-3. Make it executable: `chmod +x .claude/scripts/<name>.sh`
+1. Make it executable: `chmod +x .claude/scripts/<name>.sh`
+2. If called interactively (user invoked /draft-save): show the script and ask if they want to edit
+3. If called silently (from auto-cache rewake): produce no output

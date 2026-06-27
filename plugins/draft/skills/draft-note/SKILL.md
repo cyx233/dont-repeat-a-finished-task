@@ -38,9 +38,8 @@ description: <one-line summary -- used for matching>
 <note content -- concise, actionable, no fluff>
 ```
 
-4. Show the user the generated note.
-
-5. Ask if they want to edit anything.
+4. If called interactively (user invoked /draft-note): show the note and ask if they want to edit
+5. If called silently (from auto-cache rewake): produce no output
 
 ## Rules
 
