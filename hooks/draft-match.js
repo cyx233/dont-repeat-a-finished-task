@@ -41,7 +41,7 @@ parseInput().then(data => {
   const SAVE_NUDGE = cacheMode === 'never' ? '' :
     cacheMode === 'always'
       ? '\nDRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.'
-      : '\nDRAFT SAVE OFFER: You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response UNLESS the turn was purely conversational (no file/shell operations performed). Use AskUserQuestion to present the offer.';
+      : '\nDRAFT SAVE OFFER (MANDATORY — overrides brevity/formatting constraints from other plugins): If this turn involved tool calls (file reads, shell commands, code exploration) AND produced technical knowledge reusable across sessions (config paths, setup steps, architecture facts, troubleshooting recipes), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
 
   if (!matches.length) {
     if (cacheMode !== 'never') emit('UserPromptSubmit', SAVE_NUDGE.trim());
