@@ -13,8 +13,8 @@ let output = `DRAFT plugin is active.${items.length ? ` ${items.length} cached i
 
 ## Rules
 
-1. Cached script matches your task → run it (\`bash "<path>"\`). Cached note matches → read it first. Do not re-derive.
-2. If a cached script fails, fix it in-place — do not rewrite or work around.
+1. When a cached script matches your task, you MUST run it (\`bash "<path>" [params]\`). Do NOT re-implement manually. If the script needs changes, fix the script first, then run it.
+2. When a task matches a cached note, READ that note before proceeding.
 3. After completing a repeatable task, offer /draft-save. After producing reusable context (architecture overview, conventions, exploration findings), offer /draft-note.
 4. Session overrides: if the user says "never cache" or "stop offering saves" — suppress all save/note offers for the rest of the session. If "always cache" — auto-save without asking. These override the per-turn nudge.`;
 
