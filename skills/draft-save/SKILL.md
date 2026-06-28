@@ -1,6 +1,6 @@
 ---
 description: "Save current session work as a reusable bash/python script"
-argument-hint: "[--name <name>] [--commit <ref>]"
+argument-hint: "[--name <name>] [--commit <ref>] [--global]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
@@ -15,7 +15,7 @@ Save this session's work as a controllable, reusable script.
 
 ## Before writing
 
-1. List existing scripts: `ls .claude/scripts/`
+1. List existing scripts in the target directory
 2. If a script with the same name OR overlapping purpose already exists:
    - Show the user a diff of old vs new
    - Default to updating in-place (Edit) rather than overwriting (Write)
@@ -43,5 +43,10 @@ Pick the language that fits the task. Frontmatter format:
 
 - `@triggers`: natural-language phrases the user might type when they want this task done. Used by draft-match to surface the script. Include the obvious verbs and short aliases.
 
-Write to `.claude/scripts/<name>.<ext>`, `chmod +x`.
+## Target directory
+
+- `--global` → `~/.claude/scripts/` (shared across all projects)
+- default → `.claude/scripts/` (project-local)
+
+Write to `<target>/<name>.<ext>`, `chmod +x`.
 Show the script, ask if user wants to edit.
