@@ -11,22 +11,15 @@ const isCodex = !isCopilot && Boolean(process.env.PLUGIN_DATA);
 
 /**
  * emit(event, text) — write hook output adapted per host environment.
- * event: 'SessionStart' | 'SubagentStart' | 'UserPromptSubmit'
  */
 function emit(event, text) {
-  if (isCopilot) {
-    process.stdout.write(JSON.stringify({ additionalContext: text }));
-  } else if (isCodex) {
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: { hookEventName: event, additionalContext: text },
-    }));
-  } else if (event === 'SubagentStart') {
-    // Native Claude: SubagentStart needs JSON envelope or context is dropped
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: { hookEventName: event, additionalContext: text },
-    }));
+  // ponytail: two formats — JSON envelope (Copilot, Codex, SubagentStart) vs raw stdout
+  if (isCopilot || isCodex || event === 'SubagentStart') {
+    const payload = isCopilot
+      ? { additionalContext: text }
+      : { hookSpecificOutput: { hookEventName: event, additionalContext: text } };
+    process.stdout.write(JSON.stringify(payload));
   } else {
-    // Native Claude: SessionStart/UserPromptSubmit accept raw stdout
     process.stdout.write(text);
   }
 }

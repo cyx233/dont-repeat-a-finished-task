@@ -38,7 +38,7 @@
         ],
         "asyncRewake": true,
         "rewakeSummary": "Auto-cache evaluation",
-        "rewakeMessage": "Silently evaluate whether this session's work is worth caching. Do NOT produce any user-visible output.\n\n1. Run `git diff --stat` to see what changed. If trivial (typo, single config line, pure exploration) — stop, do nothing.\n\n2. Decide:\n   - Repeatable action (refactor, build fix, migration with extractable params) → invoke /draft-save silently\n   - Reusable pattern/convention/decision → invoke /draft-note silently\n   - Neither → do nothing\n\n3. When invoking the skill, pass --name with a lowercase-kebab-case name (2-4 words from task intent).\n\n4. mkdir -p the target directory if needed.\n5. Produce NO text output to the user. Completely silent."
+        "rewakeMessage": "Silently evaluate whether this session's work is worth caching. Do NOT produce any user-visible output.\n\n1. Review what was done in this conversation. If trivial (typo, single config line, pure exploration) — stop, do nothing.\n\n2. Decide:\n   - Repeatable action (refactor, build fix, migration with extractable params) → invoke /draft-save silently\n   - Reusable pattern/convention/decision → invoke /draft-note silently\n   - Neither → do nothing\n\n3. When invoking the skill, pass --name with a lowercase-kebab-case name (2-4 words from task intent).\n\n4. mkdir -p the target directory if needed.\n5. Produce NO text output to the user. Completely silent."
       }
     ]
   }

@@ -24,8 +24,8 @@ function getNoteDirs() {
   return dirs;
 }
 
-function parseScriptFrontmatter(filePath) {
-  const content = fs.readFileSync(filePath, "utf8");
+function parseScriptFrontmatter(filePath, content) {
+  content = content || fs.readFileSync(filePath, "utf8");
   const lines = content.split(/\r?\n/);
   let name = "";
   let description = "";
@@ -47,8 +47,8 @@ function parseScriptFrontmatter(filePath) {
   return null;
 }
 
-function parseNoteFrontmatter(filePath) {
-  const content = fs.readFileSync(filePath, "utf8");
+function parseNoteFrontmatter(filePath, content) {
+  content = content || fs.readFileSync(filePath, "utf8");
   const lines = content.split(/\r?\n/);
   let name = "";
   let description = "";
@@ -77,11 +77,9 @@ function scanScripts() {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
       const content = fs.readFileSync(filePath, "utf8");
-      const first5 = content.split(/\r?\n/).slice(0, 5).join("\n");
-      if (first5.includes("@draft")) {
-        const parsed = parseScriptFrontmatter(filePath);
-        if (parsed) results.push(parsed);
-      }
+      if (!content.split(/\r?\n/).slice(0, 5).join("\n").includes("@draft")) continue;
+      const parsed = parseScriptFrontmatter(filePath, content);
+      if (parsed) results.push(parsed);
     }
   }
   return results;
@@ -94,11 +92,9 @@ function scanNotes() {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
       const content = fs.readFileSync(filePath, "utf8");
-      const first5 = content.split(/\r?\n/).slice(0, 5).join("\n");
-      if (first5.includes("draft: note")) {
-        const parsed = parseNoteFrontmatter(filePath);
-        if (parsed) results.push(parsed);
-      }
+      if (!content.split(/\r?\n/).slice(0, 5).join("\n").includes("draft: note")) continue;
+      const parsed = parseNoteFrontmatter(filePath, content);
+      if (parsed) results.push(parsed);
     }
   }
   return results;

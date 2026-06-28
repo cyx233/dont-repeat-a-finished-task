@@ -11,9 +11,9 @@ test('draft-activate.js produces output', () => {
   assert.ok(out.includes('DRAFT plugin is active'));
 });
 
-test('auto-cache.js exits cleanly outside git repo', () => {
+test('auto-cache.js always outputs trigger', () => {
   const out = execSync(`node "${path.join(HOOKS, 'auto-cache.js')}"`, { encoding: 'utf8', cwd: '/tmp' });
-  assert.strictEqual(out, '');
+  assert.ok(out.includes('"draft":"auto-cache"'));
 });
 
 test('scan.js --all runs without error', () => {
