@@ -98,17 +98,4 @@ function setCacheMode(mode, cwd) {
   fs.writeFileSync(f, JSON.stringify(modes));
 }
 
-/**
- * getSaveNudge(cacheMode, context) — return the save-offer nudge string.
- * context: 'prompt' (default, used in match hook) or 'notification' (used in notify hook).
- */
-function getSaveNudge(cacheMode, context) {
-  if (cacheMode === 'never') return '';
-  if (cacheMode === 'always')
-    return 'DRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.';
-  if (context === 'notification')
-    return 'DRAFT SAVE OFFER: If this notification delivered substantial results (architecture summary, codebase exploration, multi-file analysis, troubleshooting findings), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save.';
-  return 'DRAFT SAVE OFFER (MANDATORY — applies at response END regardless of response length): If this turn produced reusable context (architecture overview, codebase exploration summary, design analysis, convention doc, workflow synthesis, config paths, setup steps, troubleshooting recipe), offer /draft-note as the LAST line. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
-}
-
-module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, getSaveNudge };
+module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode };

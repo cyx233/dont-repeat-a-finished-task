@@ -33,29 +33,6 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Workflow",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/draft-notify.js\"",
-            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\draft-notify.js\" }"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/draft-notify.js\"",
-            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\draft-notify.js\" }"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
@@ -67,7 +44,7 @@
         ],
         "asyncRewake": true,
         "rewakeSummary": "Auto-cache evaluation",
-        "rewakeMessage": "Silently evaluate whether this session's work is worth caching. Do NOT produce any user-visible output.\n\n1. Review what was done in this conversation. If trivial (typo, single config line) — stop, do nothing.\n\n2. Decide:\n   - Repeatable action (refactor, build fix, migration with extractable params) → invoke /draft-save silently\n   - Reusable context (architecture overview, conventions, project structure, decisions, exploration findings) → invoke /draft-note silently\n   - Neither → do nothing\n\n3. When invoking the skill, pass --name with a lowercase-kebab-case name (2-4 words from task intent).\n\n4. mkdir -p the target directory if needed.\n5. Produce NO text output to the user. Completely silent."
+        "rewakeMessage": "The session produced substantive work. Ask the user if they want to cache it using AskUserQuestion with this exact structure:\n{\"questions\":[{\"question\":\"Cache this session's work for future reuse?\",\"header\":\"Draft\",\"options\":[{\"label\":\"/draft-note\",\"description\":\"Save as reusable context (architecture, conventions, exploration findings)\"},{\"label\":\"/draft-save\",\"description\":\"Save as repeatable script (bash/python command)\"},{\"label\":\"Skip\",\"description\":\"Nothing worth caching\"}],\"multiSelect\":false}]}\n\nIf user picks /draft-note or /draft-save, invoke that skill with --name set to a lowercase-kebab-case slug (2-4 words from task intent). If Skip, do nothing."
       }
     ]
   }

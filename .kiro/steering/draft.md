@@ -11,9 +11,8 @@ A caching layer for agent workflows. Before re-implementing any task, check if i
 
 1. When a user's task matches a cached script by name or description, RUN that script directly instead of re-implementing the work.
 2. When a task matches a cached note, READ that note before proceeding.
-3. After completing a repeatable task that has no cached script, offer to save it as a reusable script.
-4. Do NOT re-derive work that a cached script already handles.
-5. Session overrides: "never cache" / "stop offering saves" → suppress all offers this session. "always cache" → auto-save without asking.
+3. Do NOT re-derive work that a cached script already handles.
+4. Users can invoke `/draft-save` or `/draft-note` to cache work. Do not proactively offer unless the user says "always cache".
 
 ## Where to find cached items
 

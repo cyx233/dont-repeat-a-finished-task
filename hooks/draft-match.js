@@ -2,7 +2,7 @@
 // draft — UserPromptSubmit hook
 // Matches user prompt against cached scripts/notes; nudges when a hit is found.
 
-const { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, getSaveNudge } = require('./draft-runtime');
+const { emit, scanCatalog, parseInput, setCacheMode } = require('./draft-runtime');
 
 parseInput().then(data => {
   const prompt = (data.prompt || '').trim().toLowerCase();
@@ -17,8 +17,6 @@ parseInput().then(data => {
     setCacheMode('always', data.cwd);
     process.exit(0);
   }
-
-  const cacheMode = getCacheMode(data.cwd);
 
   const items = scanCatalog(data.cwd);
 
@@ -37,11 +35,7 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
-  const nudgeText = getSaveNudge(cacheMode, 'prompt');
-  const SAVE_NUDGE = nudgeText ? '\n' + nudgeText : '';
-
   if (!matches.length) {
-    if (cacheMode !== 'never') emit('UserPromptSubmit', nudgeText);
     process.exit(0);
   }
 
@@ -59,7 +53,7 @@ parseInput().then(data => {
   const output = `DRAFT MATCH: Cached items may cover this task:\n` +
     lines.join('\n') + '\n' +
     'Use the cached version instead of re-implementing.\n' +
-    'REQUIREMENT: If a cached script matches, you MUST use it instead of re-implementing manually. Present the match to the user first (name, description, command), then run it. If the script needs changes, fix the script first, then run it.' + SAVE_NUDGE;
+    'REQUIREMENT: If a cached script matches, you MUST use it instead of re-implementing manually. Present the match to the user first (name, description, command), then run it. If the script needs changes, fix the script first, then run it.';
 
   emit('UserPromptSubmit', output);
 }).catch(() => {
