@@ -33,6 +33,17 @@
         ]
       }
     ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/draft-notify.js\"",
+            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\draft-notify.js\" }"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
