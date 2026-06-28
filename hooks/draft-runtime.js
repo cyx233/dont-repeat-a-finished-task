@@ -101,14 +101,27 @@ function setCacheMode(mode, cwd) {
 function autoCache() {
   parseInput().then(data => {
     if (getCacheMode(data.cwd) === 'never') process.exit(0);
-    // ponytail: fire once per session — lock prevents infinite stop loop
-    const lock = path.join(data.cwd || process.cwd(), '.claude', '.draft-rewake-lock');
-    try {
-      const st = fs.statSync(lock);
-      if (Date.now() - st.mtimeMs < 120000) process.exit(0);
-    } catch {}
-    fs.mkdirSync(path.dirname(lock), { recursive: true });
-    fs.writeFileSync(lock, '');
+    if (data.stop_hook_active) process.exit(0);
+    // ponytail: heuristic gate — only eval new activity since last check
+    if (data.transcript_path) {
+      try {
+        const mark = path.join(data.cwd || process.cwd(), '.claude', '.draft-cache-offset');
+        let offset = 0;
+        try { offset = parseInt(fs.readFileSync(mark, 'utf8')) || 0; } catch {}
+        const fd = fs.openSync(data.transcript_path, 'r');
+        const size = fs.fstatSync(fd).size;
+        if (size <= offset) { fs.closeSync(fd); process.exit(0); }
+        const buf = Buffer.alloc(size - offset);
+        fs.readSync(fd, buf, 0, buf.length, offset);
+        fs.closeSync(fd);
+        const chunk = buf.toString('utf8');
+        const userTurns = (chunk.match(/"type":"user"/g) || []).length;
+        const hasToolUse = /"type":"tool_use"/.test(chunk);
+        fs.mkdirSync(path.dirname(mark), { recursive: true });
+        fs.writeFileSync(mark, String(size));
+        if (userTurns < 3 && !hasToolUse) process.exit(0);
+      } catch {}
+    }
     setCacheMode('', data.cwd);
     process.stderr.write('Invoke /draft-auto-cache now.\n');
     process.exit(2);
