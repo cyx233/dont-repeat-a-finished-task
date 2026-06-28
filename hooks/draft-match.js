@@ -61,7 +61,7 @@ parseInput().then(data => {
   const output = `DRAFT MATCH: Cached ${matches.length === 1 ? 'item' : 'items'} may cover this task:\n` +
     lines.join('\n') + '\n' +
     'Use the cached version instead of re-implementing.\n' +
-    'REQUIREMENT: If a cached script matches, you MUST run it. Do NOT re-implement the same work manually. If the script needs changes, fix the script first, then run it.' + SAVE_NUDGE;
+    'REQUIREMENT: If a cached script matches, you MUST use it instead of re-implementing manually. Present the match to the user first (name, description, command), then run it. If the script needs changes, fix the script first, then run it.' + SAVE_NUDGE;
 
   emit('UserPromptSubmit', output);
 }).catch(() => {
