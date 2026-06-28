@@ -101,16 +101,10 @@ function setCacheMode(mode, cwd) {
 function autoCache() {
   parseInput().then(data => {
     if (getCacheMode(data.cwd) === 'never') process.exit(0);
-    // ponytail: prevent rewake-of-rewake — lockfile with 60s TTL
-    const lock = path.join(data.cwd || process.cwd(), '.claude', '.draft-rewake-lock');
-    try {
-      const st = fs.statSync(lock);
-      if (Date.now() - st.mtimeMs < 60000) process.exit(0);
-    } catch {}
-    fs.mkdirSync(path.dirname(lock), { recursive: true });
-    fs.writeFileSync(lock, '');
     setCacheMode('', data.cwd);
-    console.log('{"draft":"auto-cache"}');
+    // ponytail: sync Stop hook — exit 2 + stderr = block stop & inject reminder
+    process.stderr.write('Review this session\'s conversation. Decide: did it produce (A) a repeatable action worth scripting, (B) reusable knowledge/context worth noting, or (C) neither (trivial chat, one-off Q&A, already-cached work)?\n\nIf (C): say nothing, do not ask.\n\nIf (A) or (B): ask the user using AskUserQuestion with this structure:\n{"questions":[{"question":"Cache this session\'s work for future reuse?","header":"Draft","options":[{"label":"/draft-save","description":"Save as repeatable script (bash/python command)"},{"label":"/draft-note","description":"Save as reusable context (architecture, conventions, exploration findings)"},{"label":"Skip","description":"Nothing worth caching"}],"multiSelect":false}]}\n\nIf user picks /draft-note or /draft-save, invoke that skill with --name set to a lowercase-kebab-case slug (2-4 words from task intent). If Skip, do nothing.\n');
+    process.exit(2);
   }).catch(() => process.exit(0));
 }
 
