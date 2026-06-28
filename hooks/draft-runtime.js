@@ -2,6 +2,7 @@
 "use strict";
 
 const { execSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const scanScript = path.join(__dirname, '..', 'scripts', 'lib', 'scan.js');
@@ -68,4 +69,33 @@ function parseInput() {
   });
 }
 
-module.exports = { emit, scanCatalog, parseInput };
+// ponytail: session-level cache mode — {pid: "never"|"always"} in one JSON file
+function getModeFile(cwd) {
+  return path.join(cwd || process.env.CLAUDE_CWD || process.cwd(), '.claude', '.draft-cache-mode');
+}
+
+function readModes(cwd) {
+  try { return JSON.parse(fs.readFileSync(getModeFile(cwd), 'utf8')); } catch { return {}; }
+}
+
+function pidAlive(pid) {
+  try { process.kill(Number(pid), 0); return true; } catch { return false; }
+}
+
+function getCacheMode(cwd) {
+  return readModes(cwd)[process.ppid] || '';
+}
+
+function setCacheMode(mode, cwd) {
+  const modes = readModes(cwd);
+  for (const pid of Object.keys(modes)) {
+    if (!pidAlive(pid)) delete modes[pid];
+  }
+  if (mode) modes[process.ppid] = mode;
+  else delete modes[process.ppid];
+  const f = getModeFile(cwd);
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify(modes));
+}
+
+module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode };

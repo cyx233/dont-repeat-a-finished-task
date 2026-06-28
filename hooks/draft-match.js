@@ -2,11 +2,23 @@
 // draft — UserPromptSubmit hook
 // Matches user prompt against cached scripts/notes; nudges when a hit is found.
 
-const { emit, scanCatalog, parseInput } = require('./draft-runtime');
+const { emit, scanCatalog, parseInput, getCacheMode, setCacheMode } = require('./draft-runtime');
 
 parseInput().then(data => {
   const prompt = (data.prompt || '').trim().toLowerCase();
   if (!prompt) process.exit(0);
+
+  // Hard session override detection
+  if (/\b(never cache|stop offering saves|no more saves)\b/.test(prompt)) {
+    setCacheMode('never', data.cwd);
+    process.exit(0);
+  }
+  if (/\b(always cache|auto.?save everything)\b/.test(prompt)) {
+    setCacheMode('always', data.cwd);
+    process.exit(0);
+  }
+
+  const cacheMode = getCacheMode(data.cwd);
 
   const items = scanCatalog(data.cwd);
   if (!items.length) process.exit(0);
@@ -26,7 +38,10 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
-  const SAVE_NUDGE = '\nEnd your response with a /draft-save or /draft-note offer. Skip only if purely conversational.';
+  const SAVE_NUDGE = cacheMode === 'never' ? '' :
+    cacheMode === 'always'
+      ? '\nDRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.'
+      : '\nDRAFT SAVE OFFER: Offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response if the work qualifies. Skip if purely conversational.';
 
   if (!matches.length) {
     // ponytail: no match = no saveable work signal, skip nudge

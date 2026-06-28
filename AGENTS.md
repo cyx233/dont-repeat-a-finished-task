@@ -6,8 +6,9 @@ A caching layer for agent workflows. Scripts and notes are stored in `.claude/sc
 
 1. When a user's task matches a cached script by name or description, RUN that script directly instead of re-implementing the work.
 2. When a task matches a cached note, READ that note before proceeding.
-3. After completing a repeatable file-changing task that has no cached script, offer to save it.
+3. After completing a repeatable task that has no cached script, offer to save it.
 4. Do NOT re-derive work that a cached script already handles.
+5. Session overrides: "never cache" / "stop offering saves" → suppress all offers this session. "always cache" → auto-save without asking.
 
 ## Finding cached items
 
