@@ -47,7 +47,7 @@ output += `
 
 1. When a user's task matches a cached script by name or description, RUN that script directly instead of re-implementing the work. Use \`bash "<path>" [params]\` — no need to call /draft-find first.
 2. When a task matches a cached note, READ that note before proceeding.
-3. After completing a repeatable file-changing task that has no cached script, offer to run /draft-save.
+3. After completing a repeatable file-changing task, offer to run /draft-save. After producing reusable context (architecture overview, conventions, exploration findings), offer to run /draft-note.
 4. Do NOT re-derive work that a cached script already handles.
 5. When a cached script FAILS: fix the script in-place (edit the file), do NOT rewrite from scratch or work around it. The script is the source of truth for that task.`;
 
