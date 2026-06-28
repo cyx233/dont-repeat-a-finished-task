@@ -2,10 +2,7 @@
 // draft — SessionStart activation hook
 // Scans cache, injects behavioral rules + catalog into session context.
 
-const { emit, scanCatalog, setCacheMode } = require('./draft-runtime');
-
-// Reset session cache mode on new session
-setCacheMode('');
+const { emit, scanCatalog } = require('./draft-runtime');
 
 const items = scanCatalog();
 

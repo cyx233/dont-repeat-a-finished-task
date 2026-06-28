@@ -1,7 +1,7 @@
 ---
 description: "Delete a cached DRAFT script or note"
 argument-hint: "<name>"
-allowed-tools: ["Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/lib/*)", "Bash(rm *)"]
+allowed-tools: ["Bash", "Read"]
 ---
 
 # Draft Rm

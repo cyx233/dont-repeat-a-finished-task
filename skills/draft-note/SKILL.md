@@ -13,8 +13,7 @@ Save reusable context as a note. Notes cache knowledge that stays stable across 
 1. `--name` provided → use it. Otherwise ask.
 2. Check for existing notes in the target directory
    - If a note with the same name exists → read it, show diff, update in-place (Edit)
-   - If a note with overlapping description/content exists → ask user whether to merge or create separate
-   - If no overlap → proceed to create new file
+   - If no conflict → proceed to create new file
 3. Extract from conversation: core fact, constraints, scope.
 4. Write to `.claude/notes/<name>.md`:
 

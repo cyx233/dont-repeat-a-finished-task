@@ -21,7 +21,6 @@ parseInput().then(data => {
   const cacheMode = getCacheMode(data.cwd);
 
   const items = scanCatalog(data.cwd);
-  if (!items.length) process.exit(0);
 
   // Match: triggers first (exact phrase match), then fallback to name/description keywords
   const matches = items.filter(item => {
