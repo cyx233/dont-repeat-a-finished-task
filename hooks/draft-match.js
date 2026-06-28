@@ -44,8 +44,7 @@ parseInput().then(data => {
       : '\nDRAFT SAVE OFFER: Offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response if the work qualifies. Skip if purely conversational.';
 
   if (!matches.length) {
-    // ponytail: no match = silence. Save nudge only on "always cache" mode.
-    if (cacheMode === 'always') emit('UserPromptSubmit', SAVE_NUDGE.trim());
+    if (cacheMode !== 'never') emit('UserPromptSubmit', SAVE_NUDGE.trim());
     process.exit(0);
   }
 
