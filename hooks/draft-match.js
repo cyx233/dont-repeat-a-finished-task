@@ -26,9 +26,10 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
+  const SAVE_NUDGE = '\nREQUIREMENT: At the end of your response, you MUST include one of these offers if the work qualifies:\n- Repeatable file-changing action → offer /draft-save\n- Reusable context produced (architecture, conventions, exploration) → offer /draft-note\nOnly skip if the response is purely conversational with no reusable output.';
+
   if (!matches.length) {
-    // ponytail: always nudge — the agent decides relevance, not a keyword regex
-    emit('UserPromptSubmit', 'DRAFT: No cached match. After responding, offer /draft-save (repeatable action) or /draft-note (reusable context) if appropriate.');
+    emit('UserPromptSubmit', 'DRAFT: No cached match.' + SAVE_NUDGE);
     process.exit(0);
   }
 
@@ -39,7 +40,7 @@ parseInput().then(data => {
 
   const output = `DRAFT MATCH: Cached ${matches.length === 1 ? 'item' : 'items'} may cover this task:\n` +
     lines.join('\n') + '\n' +
-    'Use the cached version instead of re-implementing.';
+    'Use the cached version instead of re-implementing.' + SAVE_NUDGE;
 
   emit('UserPromptSubmit', output);
 }).catch(() => {
