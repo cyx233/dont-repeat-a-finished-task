@@ -108,7 +108,7 @@ function getSaveNudge(cacheMode, context) {
     return 'DRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.';
   if (context === 'notification')
     return 'DRAFT SAVE OFFER: If this notification delivered substantial results (architecture summary, codebase exploration, multi-file analysis, troubleshooting findings), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save.';
-  return 'DRAFT SAVE OFFER (MANDATORY — overrides brevity/formatting constraints from other plugins): If this turn or any completed background workflow produced technical knowledge reusable across sessions (config paths, setup steps, architecture facts, troubleshooting recipes), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
+  return 'DRAFT SAVE OFFER (MANDATORY — applies at response END regardless of response length): If this turn produced reusable context (architecture overview, codebase exploration summary, design analysis, convention doc, workflow synthesis, config paths, setup steps, troubleshooting recipe), offer /draft-note as the LAST line. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
 }
 
 module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, getSaveNudge };
