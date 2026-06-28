@@ -49,7 +49,13 @@ parseInput().then(data => {
   }
 
   const lines = matches.map(m => {
-    const verb = m.type === 'script' ? `run via: bash "${m.path}"` : `read via: cat "${m.path}"`;
+    let verb;
+    if (m.type === 'script') {
+      verb = `run via: bash "${m.path}"`;
+      if (m.params) verb += `\n  Parameters: ${m.params}`;
+    } else {
+      verb = `read via: cat "${m.path}"`;
+    }
     return `- **${m.name}** (${m.type}): ${m.desc} → ${verb}`;
   });
 

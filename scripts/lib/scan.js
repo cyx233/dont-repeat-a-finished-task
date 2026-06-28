@@ -22,19 +22,25 @@ function parseScriptFrontmatter(filePath, content) {
   let description = "";
   let triggers = "";
 
+  const params = [];
+
   for (const line of lines) {
     if (line === "# @draft") continue;
     if (line.startsWith("# @name ")) { name = line.slice("# @name ".length); continue; }
     if (line.startsWith("# @description ")) { description = line.slice("# @description ".length); continue; }
     if (line.startsWith("# @triggers ")) { triggers = line.slice("# @triggers ".length); continue; }
-    if (line.startsWith("# @param ")) continue;
+    if (line.startsWith("# @param ")) {
+      const m = line.match(/^# @param (\S+)\s+(\S+)\s+"([^"]*)"\s*(.*)?$/);
+      if (m) params.push({ name: m[1], type: m[2], desc: m[3], default: (m[4] || '').trim() });
+      continue;
+    }
     if (line.startsWith("# @requires ")) continue;
     if (line.startsWith("#!")) continue;
     if (line.startsWith("#")) continue;
     break;
   }
 
-  if (name) return { name, path: filePath, description, triggers };
+  if (name) return { name, path: filePath, description, triggers, params };
   return null;
 }
 
@@ -98,7 +104,8 @@ const mode = args[0] || "scripts";
 switch (mode) {
   case "--all":
     for (const s of scanScripts()) {
-      process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\n`);
+      const paramStr = (s.params || []).map(p => `${p.name}${p.default ? `=${p.default}` : ''}: ${p.desc}`).join('; ');
+      process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\t${paramStr}\n`);
     }
     for (const n of scanNotes()) {
       process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\t\n`);
