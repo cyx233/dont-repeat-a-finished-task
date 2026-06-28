@@ -8,7 +8,7 @@ parseInput().then(data => {
   const prompt = (data.prompt || '').trim().toLowerCase();
   if (!prompt) process.exit(0);
 
-  const items = scanCatalog();
+  const items = scanCatalog(data.cwd);
   if (!items.length) process.exit(0);
 
   // Match: triggers first (exact phrase match), then fallback to name/description keywords
