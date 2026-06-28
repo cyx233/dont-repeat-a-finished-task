@@ -115,11 +115,10 @@ function autoCache() {
         fs.readSync(fd, buf, 0, buf.length, offset);
         fs.closeSync(fd);
         const chunk = buf.toString('utf8');
-        const userTurns = (chunk.match(/"type":"user"/g) || []).length;
-        const hasToolUse = /"type":"tool_use"/.test(chunk);
+        const assistantTurns = (chunk.match(/"type":"assistant"/g) || []).length;
         fs.mkdirSync(path.dirname(mark), { recursive: true });
         fs.writeFileSync(mark, String(size));
-        if (userTurns < 3 && !hasToolUse) process.exit(0);
+        if (assistantTurns < 5) process.exit(0);
       } catch {}
     }
     setCacheMode('', data.cwd);
