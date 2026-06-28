@@ -101,6 +101,14 @@ function setCacheMode(mode, cwd) {
 function autoCache() {
   parseInput().then(data => {
     if (getCacheMode(data.cwd) === 'never') process.exit(0);
+    // ponytail: prevent rewake-of-rewake — lockfile with 60s TTL
+    const lock = path.join(data.cwd || process.cwd(), '.claude', '.draft-rewake-lock');
+    try {
+      const st = fs.statSync(lock);
+      if (Date.now() - st.mtimeMs < 60000) process.exit(0);
+    } catch {}
+    fs.mkdirSync(path.dirname(lock), { recursive: true });
+    fs.writeFileSync(lock, '');
     setCacheMode('', data.cwd);
     console.log('{"draft":"auto-cache"}');
   }).catch(() => process.exit(0));
