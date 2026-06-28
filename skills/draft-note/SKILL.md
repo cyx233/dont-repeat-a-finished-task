@@ -11,8 +11,12 @@ Save reusable context as a note. Notes cache knowledge that stays stable across 
 ## Steps
 
 1. `--name` provided → use it. Otherwise ask.
-2. Extract from conversation: core fact, constraints, scope.
-3. Write to `.claude/notes/<name>.md`:
+2. Check for existing notes: `ls .claude/notes/`
+   - If a note with the same name exists → read it, show diff, update in-place (Edit)
+   - If a note with overlapping description/content exists → ask user whether to merge or create separate
+   - If no overlap → proceed to create new file
+3. Extract from conversation: core fact, constraints, scope.
+4. Write to `.claude/notes/<name>.md`:
 
 ```markdown
 ---

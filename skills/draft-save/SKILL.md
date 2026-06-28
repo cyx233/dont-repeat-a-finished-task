@@ -13,6 +13,15 @@ Save this session's work as a controllable, reusable script.
 - `--commit <ref>`: read `git diff $COMMIT~1..$COMMIT`
 - Otherwise: review what was done in this conversation
 
+## Before writing
+
+1. List existing scripts: `ls .claude/scripts/`
+2. If a script with the same name OR overlapping purpose already exists:
+   - Show the user a diff of old vs new
+   - Default to updating in-place (Edit) rather than overwriting (Write)
+   - If the scope changed significantly, ask whether to update or create a separate script
+3. If no overlap found, proceed with new file creation
+
 ## What to extract
 
 - Side effects only (file edits, writes, installs, deploys)

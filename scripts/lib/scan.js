@@ -6,19 +6,10 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-function getScriptDirs() {
+function getDirs(subdir) {
   const dirs = [];
-  const local = path.join(process.cwd(), ".claude", "scripts");
-  const global = path.join(os.homedir(), ".claude", "scripts");
-  if (fs.existsSync(local) && fs.statSync(local).isDirectory()) dirs.push(local);
-  if (fs.existsSync(global) && fs.statSync(global).isDirectory()) dirs.push(global);
-  return dirs;
-}
-
-function getNoteDirs() {
-  const dirs = [];
-  const local = path.join(process.cwd(), ".claude", "notes");
-  const global = path.join(os.homedir(), ".claude", "notes");
+  const local = path.join(process.cwd(), ".claude", subdir);
+  const global = path.join(os.homedir(), ".claude", subdir);
   if (fs.existsSync(local) && fs.statSync(local).isDirectory()) dirs.push(local);
   if (fs.existsSync(global) && fs.statSync(global).isDirectory()) dirs.push(global);
   return dirs;
@@ -72,7 +63,7 @@ function parseNoteFrontmatter(filePath, content) {
 
 function scanScripts() {
   const results = [];
-  for (const dir of getScriptDirs()) {
+  for (const dir of getDirs("scripts")) {
     for (const entry of fs.readdirSync(dir)) {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
@@ -87,7 +78,7 @@ function scanScripts() {
 
 function scanNotes() {
   const results = [];
-  for (const dir of getNoteDirs()) {
+  for (const dir of getDirs("notes")) {
     for (const entry of fs.readdirSync(dir)) {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
@@ -139,6 +130,18 @@ switch (mode) {
         process.stdout.write(n.path + "\n");
         process.exit(0);
       }
+    }
+    process.exit(1);
+    break;
+  }
+
+  case "--find-any": {
+    const target = args[1] || "";
+    for (const s of scanScripts()) {
+      if (s.name === target) { process.stdout.write(`script\t${s.path}\n`); process.exit(0); }
+    }
+    for (const n of scanNotes()) {
+      if (n.name === target) { process.stdout.write(`note\t${n.path}\n`); process.exit(0); }
     }
     process.exit(1);
     break;

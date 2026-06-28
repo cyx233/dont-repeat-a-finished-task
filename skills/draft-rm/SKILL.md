@@ -10,14 +10,9 @@ Delete a cached item.
 
 1. Locate:
 ```!
-node "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.js" --find "$ARGUMENTS"
+node "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.js" --find-any "$ARGUMENTS"
 ```
 
-2. Not found → try note:
-```!
-node "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.js" --find-note "$ARGUMENTS"
-```
-
-3. Not found → tell user, exit.
-4. Found → show name, type, path. Confirm before deleting.
-5. `rm <path>`
+2. Not found → tell user, exit.
+3. Found → show name, type, path. Confirm before deleting.
+4. `rm <path>`
