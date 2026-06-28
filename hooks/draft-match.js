@@ -26,7 +26,11 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
-  if (!matches.length) process.exit(0);
+  if (!matches.length) {
+    // ponytail: always nudge — the agent decides relevance, not a keyword regex
+    emit('UserPromptSubmit', 'DRAFT: No cached match. After responding, offer /draft-save (repeatable action) or /draft-note (reusable context) if appropriate.');
+    process.exit(0);
+  }
 
   const lines = matches.map(m => {
     const verb = m.type === 'script' ? `run via: bash "${m.path}"` : `read via: cat "${m.path}"`;
