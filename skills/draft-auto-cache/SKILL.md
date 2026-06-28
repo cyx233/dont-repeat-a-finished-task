@@ -1,6 +1,7 @@
 ---
 description: "Evaluate whether this session's work is worth caching"
-allowed-tools: ["AskUserQuestion", "Skill"]
+argument-hint: "--mode <ask|always>"
+allowed-tools: ["AskUserQuestion", "Skill", "Bash"]
 ---
 
 # Draft Auto-Cache
@@ -9,10 +10,23 @@ Evaluate silently whether this session produced work worth caching. Do NOT outpu
 
 If the session was trivial (one-off Q&A, already-cached work, simple config, mode activation): do nothing, just stop.
 
-If it produced (A) a repeatable action worth scripting or (B) reusable knowledge/context worth noting: ask the user using AskUserQuestion:
+If it produced cacheable work, determine the type yourself:
+- **Script**: repeatable action (build fix, refactor, migration, multi-step command sequence)
+- **Note**: reusable context (architecture decisions, conventions, exploration findings)
+
+## If `--mode always`
+
+Skip asking. Directly invoke `/draft-save` or `/draft-note` based on your determination with --name set to a lowercase-kebab-case slug. If trivial, still skip.
+
+## If `--mode ask` (default)
+
+Ask the user:
 
 ```json
-{"questions":[{"question":"Cache this session's work for future reuse?","header":"Draft","options":[{"label":"/draft-save","description":"Save as repeatable script (bash/python command)"},{"label":"/draft-note","description":"Save as reusable context (architecture, conventions, exploration findings)"},{"label":"Skip","description":"Nothing worth caching"}],"multiSelect":false}]}
+{"questions":[{"question":"Cache this session's work?","header":"Draft","options":[{"label":"Yes","description":"<brief description of what you'll cache as script or note>"},{"label":"No","description":"Skip this time"},{"label":"Always","description":"Always cache without asking from now on"},{"label":"Never","description":"Disable auto-cache for this project"}],"multiSelect":false}]}
 ```
 
-If user picks /draft-note or /draft-save, invoke that skill with --name set to a lowercase-kebab-case slug (2-4 words from task intent). If Skip or no action needed, just stop.
+- **Yes**: invoke `/draft-save` or `/draft-note` (based on your determination) with --name set to a lowercase-kebab-case slug (2-4 words from task intent).
+- **No**: do nothing, just stop.
+- **Always**: run `node -e "require('${CLAUDE_PLUGIN_ROOT}/hooks/draft-runtime').setCacheMode('always', '$(pwd)')"`, then invoke `/draft-save` or `/draft-note` as above.
+- **Never**: run `node -e "require('${CLAUDE_PLUGIN_ROOT}/hooks/draft-runtime').setCacheMode('never', '$(pwd)')"` then stop.

@@ -122,8 +122,9 @@ function autoCache() {
         if (assistantTurns < 5 && chunkSize < 10000) process.exit(0);
       } catch {}
     }
-    setCacheMode('', data.cwd);
-    process.stderr.write('Invoke /draft-auto-cache now.\n');
+    const mode = getCacheMode(data.cwd);
+    if (mode !== 'always') setCacheMode('', data.cwd);
+    process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
     process.exit(2);
   }).catch(() => process.exit(0));
 }
