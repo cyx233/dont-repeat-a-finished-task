@@ -4,6 +4,8 @@ description: "Don't Repeat A Finished Task — caching layer for agent workflows
 author: cyx233
 provides_hooks:
   - SessionStart
+  - UserPromptSubmit
+  - SubagentStart
   - Stop
 provides_commands:
   - draft-save

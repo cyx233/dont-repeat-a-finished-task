@@ -2,40 +2,18 @@
 // draft — SessionStart activation hook
 // Scans cache, injects behavioral rules + catalog into session context.
 
-const { execSync } = require('child_process');
-const path = require('path');
+const { emit, scanCatalog } = require('./draft-runtime');
 
-const scanScript = path.join(__dirname, '..', 'scripts', 'lib', 'scan.js');
+const items = scanCatalog();
 
-let catalog = '';
-try {
-  catalog = execSync(`node "${scanScript}" --all`, {
-    encoding: 'utf8',
-    timeout: 3000,
-    cwd: process.env.CLAUDE_CWD || process.cwd(),
-  }).trim();
-} catch (e) {
-  // scan failed or empty — no cache
-}
-
-if (!catalog) {
-  // Empty cache — still inject rules so model knows to /draft-save after work
+if (!items.length) {
   const rules = [
     'DRAFT plugin is active. No cached scripts or notes yet.',
     'After completing a repeatable file-changing task, offer to run /draft-save.',
   ].join('\n');
-  emit(rules);
+  emit('SessionStart', rules);
   process.exit(0);
 }
-
-// Parse catalog into readable list
-const items = catalog.split('\n').filter(Boolean).map(line => {
-  const parts = line.split('\t');
-  if (parts.length >= 4) {
-    return { type: parts[0], name: parts[1], path: parts[2], desc: parts[3] };
-  }
-  return null;
-}).filter(Boolean);
 
 const scripts = items.filter(i => i.type === 'script');
 const notes = items.filter(i => i.type === 'note');
@@ -72,20 +50,4 @@ output += `
 3. After completing a repeatable file-changing task that has no cached script, offer to run /draft-save.
 4. Do NOT re-derive work that a cached script already handles.`;
 
-emit(output);
-
-// ponytail: runtime detection — adapts output format per host environment
-function emit(text) {
-  if (process.env.COPILOT_PLUGIN_DATA) {
-    process.stdout.write(JSON.stringify({ additionalContext: text }));
-  } else if (process.env.PLUGIN_DATA) {
-    process.stdout.write(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'SessionStart',
-        additionalContext: text,
-      },
-    }));
-  } else {
-    process.stdout.write(text);
-  }
-}
+emit('SessionStart', output);
