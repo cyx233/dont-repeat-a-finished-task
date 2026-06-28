@@ -100,8 +100,8 @@ function setCacheMode(mode, cwd) {
 
 function autoCache() {
   parseInput().then(data => {
-    setCacheMode('', data.cwd);
     if (getCacheMode(data.cwd) === 'never') process.exit(0);
+    setCacheMode('', data.cwd);
     console.log('{"draft":"auto-cache"}');
   }).catch(() => process.exit(0));
 }
