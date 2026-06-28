@@ -116,9 +116,10 @@ function autoCache() {
         fs.closeSync(fd);
         const chunk = buf.toString('utf8');
         const assistantTurns = (chunk.match(/"type":"assistant"/g) || []).length;
+        const chunkSize = buf.length;
         fs.mkdirSync(path.dirname(mark), { recursive: true });
         fs.writeFileSync(mark, String(size));
-        if (assistantTurns < 5) process.exit(0);
+        if (assistantTurns < 5 && chunkSize < 10000) process.exit(0);
       } catch {}
     }
     setCacheMode('', data.cwd);
