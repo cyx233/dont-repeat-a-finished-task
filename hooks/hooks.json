@@ -44,7 +44,7 @@
         ],
         "asyncRewake": true,
         "rewakeSummary": "Auto-cache evaluation",
-        "rewakeMessage": "The session produced substantive work. Ask the user if they want to cache it using AskUserQuestion with this exact structure:\n{\"questions\":[{\"question\":\"Cache this session's work for future reuse?\",\"header\":\"Draft\",\"options\":[{\"label\":\"/draft-note\",\"description\":\"Save as reusable context (architecture, conventions, exploration findings)\"},{\"label\":\"/draft-save\",\"description\":\"Save as repeatable script (bash/python command)\"},{\"label\":\"Skip\",\"description\":\"Nothing worth caching\"}],\"multiSelect\":false}]}\n\nIf user picks /draft-note or /draft-save, invoke that skill with --name set to a lowercase-kebab-case slug (2-4 words from task intent). If Skip, do nothing."
+        "rewakeMessage": "Review this session's conversation. Decide: did it produce (A) a repeatable action worth scripting, (B) reusable knowledge/context worth noting, or (C) neither (trivial chat, one-off Q&A, already-cached work)?\n\nIf (C): say nothing, do not ask.\n\nIf (A) or (B): ask the user using AskUserQuestion with this structure:\n{\"questions\":[{\"question\":\"Cache this session's work for future reuse?\",\"header\":\"Draft\",\"options\":[{\"label\":\"/draft-save\",\"description\":\"Save as repeatable script (bash/python command)\"},{\"label\":\"/draft-note\",\"description\":\"Save as reusable context (architecture, conventions, exploration findings)\"},{\"label\":\"Skip\",\"description\":\"Nothing worth caching\"}],\"multiSelect\":false}]}\n\nIf user picks /draft-note or /draft-save, invoke that skill with --name set to a lowercase-kebab-case slug (2-4 words from task intent). If Skip, do nothing."
       }
     ]
   }

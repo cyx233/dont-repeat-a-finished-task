@@ -98,4 +98,12 @@ function setCacheMode(mode, cwd) {
   fs.writeFileSync(f, JSON.stringify(modes));
 }
 
-module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode };
+function autoCache() {
+  parseInput().then(data => {
+    setCacheMode('', data.cwd);
+    if (getCacheMode(data.cwd) === 'never') process.exit(0);
+    console.log('{"draft":"auto-cache"}');
+  }).catch(() => process.exit(0));
+}
+
+module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, autoCache };
