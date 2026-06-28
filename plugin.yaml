@@ -15,3 +15,4 @@ provides_skills:
   - draft-save
   - draft-note
   - draft-rm
+  - draft-auto-cache
