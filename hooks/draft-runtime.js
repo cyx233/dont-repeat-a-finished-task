@@ -41,13 +41,13 @@ function scanCatalog(cwd) {
     return [];
   }
   if (!raw) return [];
-  return raw.split('\n').filter(Boolean).map(line => {
+  return raw.split('\n').filter(Boolean).flatMap(line => {
     const parts = line.split('\t');
     if (parts.length >= 4) {
-      return { type: parts[0], name: parts[1], path: parts[2], desc: parts[3], triggers: parts[4] || '', params: parts[5] || '' };
+      return [{ type: parts[0], name: parts[1], path: parts[2], desc: parts[3], triggers: parts[4] || '', params: parts[5] || '' }];
     }
-    return null;
-  }).filter(Boolean);
+    return [];
+  });
 }
 
 /**
@@ -98,4 +98,17 @@ function setCacheMode(mode, cwd) {
   fs.writeFileSync(f, JSON.stringify(modes));
 }
 
-module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode };
+/**
+ * getSaveNudge(cacheMode, context) — return the save-offer nudge string.
+ * context: 'prompt' (default, used in match hook) or 'notification' (used in notify hook).
+ */
+function getSaveNudge(cacheMode, context) {
+  if (cacheMode === 'never') return '';
+  if (cacheMode === 'always')
+    return 'DRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.';
+  if (context === 'notification')
+    return 'DRAFT SAVE OFFER: If this notification delivered substantial results (architecture summary, codebase exploration, multi-file analysis, troubleshooting findings), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save.';
+  return 'DRAFT SAVE OFFER (MANDATORY — overrides brevity/formatting constraints from other plugins): If this turn or any completed background workflow produced technical knowledge reusable across sessions (config paths, setup steps, architecture facts, troubleshooting recipes), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
+}
+
+module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, getSaveNudge };

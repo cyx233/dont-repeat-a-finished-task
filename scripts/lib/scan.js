@@ -16,7 +16,6 @@ function getDirs(subdir) {
 }
 
 function parseScriptFrontmatter(filePath, content) {
-  content = content || fs.readFileSync(filePath, "utf8");
   const lines = content.split(/\r?\n/);
   let name = "";
   let description = "";
@@ -34,7 +33,6 @@ function parseScriptFrontmatter(filePath, content) {
       if (m) params.push({ name: m[1], type: m[2], desc: m[3], default: (m[4] || '').trim() });
       continue;
     }
-    if (line.startsWith("# @requires ")) continue;
     if (line.startsWith("#!")) continue;
     if (line.startsWith("#")) continue;
     break;
@@ -45,7 +43,6 @@ function parseScriptFrontmatter(filePath, content) {
 }
 
 function parseNoteFrontmatter(filePath, content) {
-  content = content || fs.readFileSync(filePath, "utf8");
   const lines = content.split(/\r?\n/);
   let name = "";
   let description = "";
@@ -74,7 +71,7 @@ function scanScripts() {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
       const content = fs.readFileSync(filePath, "utf8");
-      if (!content.split(/\r?\n/).slice(0, 5).join("\n").includes("@draft")) continue;
+      if (!content.slice(0, 300).includes("@draft")) continue;
       const parsed = parseScriptFrontmatter(filePath, content);
       if (parsed) results.push(parsed);
     }
@@ -89,7 +86,7 @@ function scanNotes() {
       const filePath = path.join(dir, entry);
       if (!fs.statSync(filePath).isFile()) continue;
       const content = fs.readFileSync(filePath, "utf8");
-      if (!content.split(/\r?\n/).slice(0, 5).join("\n").includes("draft: note")) continue;
+      if (!content.slice(0, 300).includes("draft: note")) continue;
       const parsed = parseNoteFrontmatter(filePath, content);
       if (parsed) results.push(parsed);
     }
@@ -127,7 +124,6 @@ switch (mode) {
       }
     }
     process.exit(1);
-    break;
   }
 
   case "--find-note": {
@@ -139,7 +135,6 @@ switch (mode) {
       }
     }
     process.exit(1);
-    break;
   }
 
   case "--find-any": {
@@ -151,7 +146,6 @@ switch (mode) {
       if (n.name === target) { process.stdout.write(`note\t${n.path}\n`); process.exit(0); }
     }
     process.exit(1);
-    break;
   }
 
   default:

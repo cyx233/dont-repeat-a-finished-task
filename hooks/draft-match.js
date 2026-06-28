@@ -2,7 +2,7 @@
 // draft — UserPromptSubmit hook
 // Matches user prompt against cached scripts/notes; nudges when a hit is found.
 
-const { emit, scanCatalog, parseInput, getCacheMode, setCacheMode } = require('./draft-runtime');
+const { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, getSaveNudge } = require('./draft-runtime');
 
 parseInput().then(data => {
   const prompt = (data.prompt || '').trim().toLowerCase();
@@ -38,13 +38,11 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
-  const SAVE_NUDGE = cacheMode === 'never' ? '' :
-    cacheMode === 'always'
-      ? '\nDRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.'
-      : '\nDRAFT SAVE OFFER (MANDATORY — overrides brevity/formatting constraints from other plugins): If this turn or any completed background workflow produced technical knowledge reusable across sessions (config paths, setup steps, architecture facts, troubleshooting recipes), you MUST offer /draft-note. If it produced a repeatable action, offer /draft-save. Skip ONLY for pure conversational turns with zero tool calls.';
+  const nudgeText = getSaveNudge(cacheMode, 'prompt');
+  const SAVE_NUDGE = nudgeText ? '\n' + nudgeText : '';
 
   if (!matches.length) {
-    if (cacheMode !== 'never') emit('UserPromptSubmit', SAVE_NUDGE.trim());
+    if (cacheMode !== 'never') emit('UserPromptSubmit', nudgeText);
     process.exit(0);
   }
 
@@ -59,7 +57,7 @@ parseInput().then(data => {
     return `- **${m.name}** (${m.type}): ${m.desc} → ${verb}`;
   });
 
-  const output = `DRAFT MATCH: Cached ${matches.length === 1 ? 'item' : 'items'} may cover this task:\n` +
+  const output = `DRAFT MATCH: Cached items may cover this task:\n` +
     lines.join('\n') + '\n' +
     'Use the cached version instead of re-implementing.\n' +
     'REQUIREMENT: If a cached script matches, you MUST use it instead of re-implementing manually. Present the match to the user first (name, description, command), then run it. If the script needs changes, fix the script first, then run it.' + SAVE_NUDGE;
