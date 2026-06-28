@@ -26,10 +26,15 @@ parseInput().then(data => {
     return prompt.includes(item.name) || hitCount >= 2;
   });
 
-  const SAVE_NUDGE = '\nREQUIREMENT: At the end of your response, you MUST include one of these offers if the work qualifies:\n- Repeatable file-changing action → offer /draft-save\n- Reusable context produced (architecture, conventions, exploration) → offer /draft-note\nOnly skip if the response is purely conversational with no reusable output.';
+  const SAVE_NUDGE = '\nEnd your response with a /draft-save or /draft-note offer. Skip only if purely conversational.';
 
   if (!matches.length) {
-    emit('UserPromptSubmit', 'DRAFT: No cached match.' + SAVE_NUDGE);
+    // ponytail: no match = no saveable work signal, skip nudge
+    const words = prompt.split(/\s+/).length;
+    const actionVerbs = /\b(create|build|fix|write|implement|add|update|refactor|generate|deploy|migrate)\b/;
+    if (words > 10 && actionVerbs.test(prompt)) {
+      emit('UserPromptSubmit', 'DRAFT: No cached match.' + SAVE_NUDGE);
+    }
     process.exit(0);
   }
 

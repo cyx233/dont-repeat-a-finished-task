@@ -10,10 +10,8 @@ let output = `DRAFT plugin is active.${items.length ? ` ${items.length} cached i
 
 ## Rules
 
-1. When a user's task matches a cached script by name or description, RUN that script directly instead of re-implementing the work. Use \`bash "<path>" [params]\`.
-2. When a task matches a cached note, READ that note before proceeding.
-3. After completing a repeatable file-changing task, offer to run /draft-save. After producing reusable context (architecture overview, conventions, exploration findings), offer to run /draft-note.
-4. Do NOT re-derive work that a cached script already handles.
-5. When a cached script FAILS: fix the script in-place (edit the file), do NOT rewrite from scratch or work around it. The script is the source of truth for that task.`;
+1. Cached script matches your task → run it (\`bash "<path>"\`). Cached note matches → read it first. Do not re-derive.
+2. If a cached script fails, fix it in-place — do not rewrite or work around.
+3. End responses with a /draft-save or /draft-note offer. Skip only if purely conversational.`;
 
 emit('SessionStart', output);
