@@ -29,18 +29,21 @@ function parseScriptFrontmatter(filePath) {
   const lines = content.split(/\r?\n/);
   let name = "";
   let description = "";
+  let triggers = "";
 
   for (const line of lines) {
     if (line === "# @draft") continue;
     if (line.startsWith("# @name ")) { name = line.slice("# @name ".length); continue; }
     if (line.startsWith("# @description ")) { description = line.slice("# @description ".length); continue; }
+    if (line.startsWith("# @triggers ")) { triggers = line.slice("# @triggers ".length); continue; }
     if (line.startsWith("# @param ")) continue;
+    if (line.startsWith("# @requires ")) continue;
     if (line.startsWith("#!")) continue;
     if (line.startsWith("#")) continue;
     break;
   }
 
-  if (name) return { name, path: filePath, description };
+  if (name) return { name, path: filePath, description, triggers };
   return null;
 }
 
@@ -108,10 +111,10 @@ const mode = args[0] || "scripts";
 switch (mode) {
   case "--all":
     for (const s of scanScripts()) {
-      process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\n`);
+      process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\n`);
     }
     for (const n of scanNotes()) {
-      process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\n`);
+      process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\t\n`);
     }
     break;
 

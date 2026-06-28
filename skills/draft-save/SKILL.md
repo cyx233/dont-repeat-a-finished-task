@@ -29,7 +29,10 @@ Pick the language that fits the task. Frontmatter format:
 # @name <name>
 # @description <one line>
 # @param <name> <type> "<description>" [default]
+# @triggers <comma-separated phrases that should match this script>
 ```
+
+- `@triggers`: natural-language phrases the user might type when they want this task done. Used by draft-match to surface the script. Include the obvious verbs and short aliases.
 
 Write to `.claude/scripts/<name>.<ext>`, `chmod +x`.
 Show the script, ask if user wants to edit.

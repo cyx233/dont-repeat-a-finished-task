@@ -11,14 +11,18 @@ parseInput().then(data => {
   const items = scanCatalog();
   if (!items.length) process.exit(0);
 
-  // Match: check if any script/note name or description words appear in the prompt
+  // Match: triggers first (exact phrase match), then fallback to name/description keywords
   const matches = items.filter(item => {
+    // Trigger phrases are the strongest signal
+    if (item.triggers) {
+      const phrases = item.triggers.split(',').map(t => t.trim().toLowerCase());
+      if (phrases.some(p => p && prompt.includes(p))) return true;
+    }
     const keywords = [
       ...item.name.split(/[-_]+/),
       ...item.desc.toLowerCase().split(/\s+/),
     ].filter(w => w.length > 3);
     const hitCount = keywords.filter(k => prompt.includes(k)).length;
-    // Require at least 2 keyword hits or an exact name match
     return prompt.includes(item.name) || hitCount >= 2;
   });
 

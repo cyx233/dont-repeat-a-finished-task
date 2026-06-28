@@ -50,7 +50,7 @@ function scanCatalog(cwd) {
   return raw.split('\n').filter(Boolean).map(line => {
     const parts = line.split('\t');
     if (parts.length >= 4) {
-      return { type: parts[0], name: parts[1], path: parts[2], desc: parts[3] };
+      return { type: parts[0], name: parts[1], path: parts[2], desc: parts[3], triggers: parts[4] || '' };
     }
     return null;
   }).filter(Boolean);
