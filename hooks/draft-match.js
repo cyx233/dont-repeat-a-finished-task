@@ -41,7 +41,7 @@ parseInput().then(data => {
   const SAVE_NUDGE = cacheMode === 'never' ? '' :
     cacheMode === 'always'
       ? '\nDRAFT: Auto-cache is ON. You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response.'
-      : '\nDRAFT SAVE OFFER: Offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response if the work qualifies. Skip if purely conversational.';
+      : '\nDRAFT SAVE OFFER: You MUST offer /draft-save (repeatable action) or /draft-note (reusable context) at the end of your response UNLESS the turn was purely conversational (no file/shell operations performed). Use AskUserQuestion to present the offer.';
 
   if (!matches.length) {
     if (cacheMode !== 'never') emit('UserPromptSubmit', SAVE_NUDGE.trim());
