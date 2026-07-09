@@ -2,7 +2,7 @@
 
 <p align="center"><em>Don't Repeat A Finished Task</em></p>
 
-<p align="center"><strong>Agent Injection Hooks</strong> for AI coding agents</p>
+<p align="center"><strong>Programmatic <code>/btw</code></strong> for AI coding agent hooks</p>
 
 <p align="center">
   <img src="https://img.shields.io/npm/v/@cyx233/draft?style=flat-square" alt="npm">
@@ -14,49 +14,60 @@
 
 ## The Problem
 
-AI coding agents have hooks (shell commands on events). But hooks can't *think* — they match strings, not intent. You can't reliably inject context, route tasks, or guard actions without LLM judgment.
+Agent hooks can run shell commands on events — but they can't *think*. You need LLM judgment inside hooks (semantic matching, decision-making), but spawning a cold `claude -p` loses all context and cache.
 
 ## The Solution
 
-**Agent Hooks** let any hook invoke the host's own LLM as a sub-agent — one function call, zero API keys, zero infinite loops.
+**Programmatic `/btw`** — call the host LLM from within a hook, reusing the parent session's full context and KV cache. Like `/btw` but invoked by code, not a human.
 
 ```javascript
-const { query } = require('@cyx233/draft');
+const { forkQueryStrict } = require('@cyx233/draft');
 
-const result = query('Which cached scripts match this task?', {
-  schema: { type: 'object', properties: { matches: { type: 'array', items: { type: 'string' } } } }
-});
+// Inside a hook: ask the parent session a side-question
+// Full context visible, doesn't pollute conversation history
+const result = forkQueryStrict(
+  'Which cached scripts match this user task?',
+  { sessionId: data.session_id, agent: 'draft-matcher' }
+);
+// result = { matches: ["eslint-setup"] }
 ```
 
-The hook calls the host CLI (`claude -p`, `codex exec`, `gemini -p`, `q chat`) under the hood. Same auth, same model, same session isolation.
+Under the hood: `claude --resume <session> --fork-session -p` — same auth, same context, same cache. The forked query sees everything the main agent sees, but its output never enters the conversation.
 
-## What This Enables
+## How It Works
 
-| Pattern | How |
-|---------|-----|
-| **Semantic routing** | Match user intent to cached scripts — not keywords |
-| **Pre-flight checks** | Validate before the main agent acts |
-| **Smart context injection** | Load only relevant docs into context |
-| **Guard rails** | Block dangerous operations with LLM judgment |
+```
+Hook starts (deterministic, <10ms)
+  → Programmatic /btw: "which cached scripts match this task?"
+  → Sub-agent answers (shares parent KV cache, warm)
+  → Answer returns to hook JS
+  → Hook injects matched content into context
+  → exit 0
+Main agent continues (warm, with injected context)
+```
 
-## Built-in: DRAFT Agent
+No cold starts. No context loss. No history pollution.
 
-The repo ships a **DRAFT agent** (Don't Repeat A Finished Task) — a task caching layer built on agent hooks:
+## Built-in: Task Caching
+
+The plugin ships a task cache built on programmatic `/btw`:
 
 ```
 You: "set up ESLint"
-→ Hook invokes LLM: "does any cached script match?"
-→ LLM returns: eslint-setup
-→ Hook injects script content
-→ Agent runs it. 2 seconds, not 45.
+  → Hook /btw: "does any cached script match?"
+  → Sub-agent: "eslint-setup"
+  → Hook injects the script
+  → Main agent runs it. 2 seconds, not 45.
 ```
 
 Scripts live in `.claude/scripts/`, notes in `.claude/notes/`.
 
+At session end, another `/btw` evaluates whether the work is worth caching — and if so, hands off to the main agent to save it.
+
 ## Install
 
 ```bash
-# Claude Code
+# Claude Code plugin
 /plugin install draft
 
 # npm (for library use)
@@ -65,7 +76,26 @@ npm install @cyx233/draft
 
 ## API
 
+### `forkQueryStrict(prompt, opts?)` — Programmatic `/btw` with guaranteed structured output
+
+Forks the parent session, asks a side-question, retries on malformed JSON. Returns parsed object or throws.
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `sessionId` | — | Session to fork (falls back to `--continue`) |
+| `agent` | — | Agent to invoke in the fork |
+| `timeout` | 15000 | ms |
+| `effort` | `'low'` | Inference effort level |
+| `maxRetries` | 2 | Retry on parse failure |
+| `validate` | — | `(parsed) => bool` — custom validation |
+
+### `forkQuery(prompt, opts?)`
+
+Same as above but without retry/validation. Returns parsed JSON or raw string.
+
 ### `query(prompt, opts?)`
+
+Cold-start one-shot (no context reuse). For hosts without `--fork-session` support.
 
 | Option | Default | Description |
 |--------|---------|-------------|
@@ -77,16 +107,7 @@ npm install @cyx233/draft
 
 Returns the first available host CLI, or `null`.
 
-## Host Support
-
-| Host | Binary | One-shot syntax |
-|------|--------|----------------|
-| Claude Code | `claude` | `claude -p --output-format json` |
-| Codex | `codex` | `codex exec` |
-| Gemini CLI | `gemini` | `gemini -p` |
-| Amazon Q | `q` | `q chat --no-interactive` |
-
-## DRAFT Commands
+## Commands
 
 | Command | Description |
 |---------|-------------|

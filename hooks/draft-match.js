@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime');
-const { query, detectHost } = require('../lib/agent-hook');
+const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
 
 parseInput().then(data => {
   const prompt = (data.user_prompt || data.prompt || '').trim();
@@ -17,21 +17,29 @@ parseInput().then(data => {
   if (!items.length) process.exit(0);
 
   if (!detectHost()) {
+    // No CLI available — inject full catalog as fallback
     const lines = items.map(m => `- ${m.name} (${m.type}): ${m.desc} → ${m.path}`);
     emit('UserPromptSubmit', `DRAFT CATALOG:\n${lines.join('\n')}\nUse matching items instead of re-implementing.`);
     process.exit(0);
   }
 
+  // Fork hack: sub-agent with parent context, structured output + retry
   const catalog = items.map(m => `${m.name} (${m.type}): ${m.desc}`).join('\n');
-  const result = query(
-    `User task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn names of items that match this task.`,
-    { schema: { type: 'object', properties: { matches: { type: 'array', items: { type: 'string' } } }, required: ['matches'] }, timeout: 10000 }
+  const result = forkQueryStrict(
+    `User task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn names of items that match this task. JSON only: {"matches": ["name1"]}`,
+    {
+      sessionId: data.session_id,
+      agent: 'draft-matcher',
+      timeout: 12000,
+      validate: r => Array.isArray(r && r.matches),
+    }
   );
 
   const names = (result && result.matches) || [];
   const matched = items.filter(m => names.includes(m.name));
   if (!matched.length) process.exit(0);
 
+  // Remaining hook: inject matched script/note content
   const sections = matched.map(m => {
     const content = fs.readFileSync(m.path, 'utf8');
     const cmd = m.type === 'script' ? `bash "${m.path}"` : '(note)';
