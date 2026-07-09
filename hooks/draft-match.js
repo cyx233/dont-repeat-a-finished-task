@@ -5,6 +5,14 @@ const fs = require('fs');
 const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime');
 const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
 
+function projectRoot(data) {
+  if (data.transcript_path) {
+    const m = data.transcript_path.match(/projects\/(-[^/]+)\//);
+    if (m) return m[1].replace(/^-/, '/').replace(/-/g, '/');
+  }
+  return data.cwd;
+}
+
 parseInput().then(data => {
   const prompt = (data.user_prompt || data.prompt || '').trim();
   if (!prompt) process.exit(0);
@@ -31,7 +39,7 @@ parseInput().then(data => {
       sessionId: data.session_id,
       agent: 'draft-matcher',
       timeout: 12000,
-      cwd: data.cwd,
+      cwd: projectRoot(data),
       validate: r => Array.isArray(r && r.matches),
     }
   );

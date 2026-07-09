@@ -6,6 +6,16 @@ const path = require('path');
 const { parseInput, getCacheMode, setCacheMode } = require('./draft-runtime');
 const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
 
+// --bare uses cwd to derive project slug for session lookup.
+// transcript_path encodes the real project slug: ~/.claude/projects/<slug>/<session>.jsonl
+function projectRoot(data) {
+  if (data.transcript_path) {
+    const m = data.transcript_path.match(/projects\/(-[^/]+)\//);
+    if (m) return m[1].replace(/^-/, '/').replace(/-/g, '/');
+  }
+  return data.cwd;
+}
+
 parseInput().then(data => {
   if (getCacheMode(data.cwd) === 'never') process.exit(0);
   if (data.stop_hook_active) process.exit(0);
@@ -20,11 +30,8 @@ parseInput().then(data => {
   }
 
   const mode = getCacheMode(data.cwd);
-  const host = detectHost();
-  fs.writeFileSync('/tmp/draft-stop-gate.json', JSON.stringify({ host, mode, cwd: data.cwd, sessionId: data.session_id }));
 
-  if (!host) {
-    // No CLI — fall back to exit 2 with generic invoke
+  if (!detectHost()) {
     process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
     process.exit(2);
   }
@@ -38,16 +45,13 @@ parseInput().then(data => {
         sessionId: data.session_id,
         agent: 'draft-evaluator',
         timeout: 30000,
-        cwd: data.cwd,
+        cwd: projectRoot(data),
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
-  } catch (e) {
-    fs.writeFileSync('/tmp/draft-fork-error.json', JSON.stringify({ error: e.message, code: e.status, signal: e.signal }));
+  } catch {
     process.exit(0);
   }
-
-  fs.writeFileSync('/tmp/draft-fork-result.json', JSON.stringify({ decision, mode }));
 
   if (!decision || !decision.cache) process.exit(0);
 
