@@ -26,7 +26,7 @@ You: "set up ESLint"
 1. **On prompt** — a `UserPromptSubmit` hook scans `~/.claude/{scripts,notes}/` and runs local vector search (cosine similarity via `all-MiniLM-L6-v2`) to semantically match. No API calls, no subprocess forks. Matched content is injected into context.
 2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it as a script (repeatable action) or note (reusable context).
 
-Cache is global (`~/.claude/`) — shared across all projects. Vector index lives at `~/.claude/.draft-vectors.json` and rebuilds on each save.
+Cache is global (`~/.claude/`) — shared across all projects. Vector index lives at `~/.claude/.draft-vectors/` and rebuilds incrementally on each save.
 
 ## Install
 
@@ -41,6 +41,11 @@ Cache is global (`~/.claude/`) — shared across all projects. Vector index live
 
 (Two separate prompts.)
 
+On first use, the plugin will prompt you to install the embedding model. Or run manually:
+
+```
+cd ~/.claude/plugins/cache/dont-repeat-a-finished-task/draft/*/  && npm run setup
+```
 
 ## Commands
 

@@ -2,9 +2,16 @@
 "use strict";
 
 const fs = require('fs');
+const path = require('path');
 const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime');
-const { matchByVector } = require('../lib/embedder');
 const { getSessionCwd } = require('../lib/agent-hook');
+
+function depInstalled() {
+  try {
+    require.resolve('@huggingface/transformers', { paths: [path.resolve(__dirname, '..')] });
+    return true;
+  } catch { return false; }
+}
 
 parseInput().then(async data => {
   const prompt = (data.user_prompt || data.prompt || '').trim();
@@ -17,6 +24,14 @@ parseInput().then(async data => {
   const items = scanCatalog(getSessionCwd({ transcriptPath: data.transcript_path }) || data.cwd);
   if (!items.length) process.exit(0);
 
+  if (!depInstalled()) {
+    emit('UserPromptSubmit',
+      'DRAFT: Embedding model not yet installed. Run this once to enable semantic matching:\n```\ncd "' +
+      path.resolve(__dirname, '..') + '" && npm install --omit=dev\n```');
+    process.exit(0);
+  }
+
+  const { matchByVector } = require('../lib/embedder');
   const names = await matchByVector(prompt, items) || [];
   const matched = items.filter(m => names.includes(m.name));
   if (!matched.length) process.exit(0);
