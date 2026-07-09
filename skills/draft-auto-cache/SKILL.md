@@ -12,7 +12,9 @@ If the session was trivial (one-off Q&A, already-cached work, simple config, mod
 
 If it produced cacheable work, determine the type yourself:
 - **Script**: repeatable action (build fix, refactor, migration, multi-step command sequence)
-- **Note**: reusable context (architecture decisions, conventions, exploration findings)
+- **Note**: reusable context (architecture decisions, conventions, exploration findings, codebase summaries)
+
+**Important**: a session that reads code and produces a structured summary or architecture analysis IS cacheable as a note — the output has lasting value even though the session had no side effects. "No side effects" ≠ "trivial".
 
 ## If `--mode always`
 
