@@ -40,7 +40,8 @@ parseInput().then(data => {
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
-  } catch {
+  } catch (e) {
+    fs.writeFileSync('/tmp/draft-fork-error.json', JSON.stringify({ error: e.message, code: e.status, signal: e.signal }));
     process.exit(0);
   }
 
