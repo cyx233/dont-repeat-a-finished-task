@@ -44,6 +44,8 @@ parseInput().then(data => {
     process.exit(0);
   }
 
+  fs.writeFileSync('/tmp/draft-fork-result.json', JSON.stringify({ decision, mode }));
+
   if (!decision || !decision.cache) process.exit(0);
 
   // Decision made — now hand off to main agent for execution via exit 2
