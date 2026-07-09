@@ -35,7 +35,6 @@ parseInput().then(data => {
         sessionId: data.session_id,
         agent: 'draft-evaluator',
         timeout: 30000,
-        cwd: data.cwd,
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
