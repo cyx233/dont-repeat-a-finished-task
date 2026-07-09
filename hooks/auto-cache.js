@@ -40,7 +40,7 @@ parseInput().then(data => {
       }
     );
   } catch (e) {
-    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, code: e.status }));
+    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, code: e.status, stderr: (e.stderr || '').toString().slice(0, 500) }));
     process.exit(0);
   }
 
