@@ -7,8 +7,9 @@ const { parseInput, getCacheMode, setCacheMode } = require('./draft-runtime');
 const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
 
 parseInput().then(data => {
-  if (getCacheMode(data.cwd) === 'never') process.exit(0);
-  if (data.stop_hook_active) process.exit(0);
+  fs.writeFileSync('/tmp/draft-stop-debug.json', JSON.stringify(data, null, 2));
+  if (getCacheMode(data.cwd) === 'never') { fs.appendFileSync('/tmp/draft-stop-debug.json', '\nEXIT: never mode'); process.exit(0); }
+  if (data.stop_hook_active) { fs.appendFileSync('/tmp/draft-stop-debug.json', '\nEXIT: stop_hook_active'); process.exit(0); }
 
   // Gate: skip if session too short
   if (data.transcript_path) {
