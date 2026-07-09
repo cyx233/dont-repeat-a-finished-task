@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime');
-const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
+const { forkQueryStrict, detectHost, getSessionCwd } = require('../lib/agent-hook');
 
 parseInput().then(data => {
   const prompt = (data.user_prompt || data.prompt || '').trim();
@@ -13,7 +13,7 @@ parseInput().then(data => {
   if (/\b(never cache|stop offering saves)\b/.test(lower)) { setCacheMode('never', data.cwd); process.exit(0); }
   if (/\b(always cache)\b/.test(lower)) { setCacheMode('always', data.cwd); process.exit(0); }
 
-  const items = scanCatalog(data.cwd);
+  const items = scanCatalog(getSessionCwd({ transcriptPath: data.transcript_path }) || data.cwd);
   if (!items.length) process.exit(0);
 
   if (!detectHost()) {
