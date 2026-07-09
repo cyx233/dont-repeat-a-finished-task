@@ -20,11 +20,8 @@ parseInput().then(data => {
   }
 
   const mode = getCacheMode(data.cwd);
-  const host = detectHost();
-  fs.writeFileSync('/tmp/draft-stop-gate.json', JSON.stringify({ host, mode, cwd: data.cwd, sessionId: data.session_id }));
 
-  if (!host) {
-    // No CLI — fall back to exit 2 with generic invoke
+  if (!detectHost()) {
     process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
     process.exit(2);
   }
@@ -42,12 +39,9 @@ parseInput().then(data => {
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
-  } catch (e) {
-    fs.writeFileSync('/tmp/draft-fork-error.json', JSON.stringify({ error: e.message, code: e.status, signal: e.signal }));
+  } catch {
     process.exit(0);
   }
-
-  fs.writeFileSync('/tmp/draft-fork-result.json', JSON.stringify({ decision, mode }));
 
   if (!decision || !decision.cache) process.exit(0);
 
