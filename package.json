@@ -12,7 +12,7 @@
     ".": "./lib/agent-hook.js",
     "./lib/agent-hook": "./lib/agent-hook.js"
   },
-  "files": ["lib/", "hooks/", "skills/", "scripts/lib/", "agents/", "LICENSE"],
+  "files": ["lib/", "hooks/", "skills/", "scripts/lib/", "LICENSE"],
   "scripts": { "test": "node --test tests/*.test.js" },
   "optionalDependencies": {
     "@huggingface/transformers": "^4.2.0"
