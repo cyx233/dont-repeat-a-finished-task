@@ -10,47 +10,37 @@
 
 ---
 
-## What it does
+## Core Concept
 
-Caches your completed work (scripts and notes) and auto-injects them when a future task matches.
+You solved a task once. The agent remembers. Next time it matches, the cached script runs in seconds — no re-thinking, no re-implementing.
 
 ```
 You: "set up ESLint"
-  → Hook matches cached script "eslint-setup"
-  → Injects it into context
-  → Agent runs it. 2 seconds, not 45.
+  → Hook matches cached "eslint-setup"
+  → Injects script into context
+  → Done. 2 seconds, not 45.
 ```
-
-Scripts and notes live in `~/.claude/scripts/` and `~/.claude/notes/` — shared across all projects.
 
 ## How It Works
 
-1. **On prompt** — a `UserPromptSubmit` hook scans your cache and uses **programmatic `/btw`** (`claude --resume <session> --fork-session -p`) to semantically match. The fork shares the parent session's KV cache — no cold start, no history pollution. Matched scripts/notes are injected into context.
-2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it.
+1. **On prompt** — a `UserPromptSubmit` hook scans `~/.claude/{scripts,notes}/` and uses **programmatic `/btw`** (`claude --resume <session> --fork-session -p`) to semantically match. The fork shares the parent session's KV cache — no cold start, no history pollution. Matched content is injected into context.
+2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it as a script (repeatable action) or note (reusable context).
+
+Cache is global (`~/.claude/`) — shared across all projects.
 
 ## Install
 
-```bash
+### Claude Code
+
+```
+/plugin marketplace add cyx233/dont-repeat-a-finished-task
+```
+```
 /plugin install draft
 ```
 
-## Library
+(Two separate prompts.)
 
-The fork primitive is also available as an npm package for building your own hooks:
-
-```bash
-npm install @cyx233/draft
-```
-
-```javascript
-const { forkQueryStrict } = require('@cyx233/draft');
-
-const result = forkQueryStrict('Return {"answer": 42}', {
-  sessionId: data.session_id,
-  timeout: 15000,
-  validate: r => typeof r.answer === 'number',
-});
-```
 
 ## Commands
 
