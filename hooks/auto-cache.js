@@ -20,8 +20,10 @@ parseInput().then(data => {
   }
 
   const mode = getCacheMode(data.cwd);
+  const host = detectHost();
+  fs.writeFileSync('/tmp/draft-stop-gate.json', JSON.stringify({ host, mode, cwd: data.cwd, sessionId: data.session_id }));
 
-  if (!detectHost()) {
+  if (!host) {
     // No CLI — fall back to exit 2 with generic invoke
     process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
     process.exit(2);
