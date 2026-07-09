@@ -62,7 +62,7 @@ You: "set up ESLint"
 
 Scripts live in `.claude/scripts/`, notes in `.claude/notes/`.
 
-At session end, another `/btw` evaluates whether the work is worth caching — and if so, hands off to the main agent to save it.
+At response end, a lightweight Stop hook hands off to the main agent to evaluate and cache the work (no fork needed — the main agent already has full context).
 
 ## Install
 
@@ -84,8 +84,8 @@ Forks the parent session, asks a side-question, retries on malformed JSON. Retur
 |--------|---------|-------------|
 | `sessionId` | — | Session to fork (falls back to `--continue`) |
 | `agent` | — | Agent to invoke in the fork |
+| `transcriptPath` | — | Path to session transcript (for cwd lookup) |
 | `timeout` | 15000 | ms |
-| `effort` | `'low'` | Inference effort level |
 | `maxRetries` | 2 | Retry on parse failure |
 | `validate` | — | `(parsed) => bool` — custom validation |
 
