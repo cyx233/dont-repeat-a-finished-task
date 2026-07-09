@@ -23,10 +23,10 @@ You: "set up ESLint"
 
 ## How It Works
 
-1. **On prompt** — a `UserPromptSubmit` hook scans `~/.claude/{scripts,notes}/` and uses **programmatic `/btw`** (`claude --resume <session> --fork-session -p`) to semantically match. The fork shares the parent session's KV cache — no cold start, no history pollution. Matched content is injected into context.
+1. **On prompt** — a `UserPromptSubmit` hook scans `~/.claude/{scripts,notes}/` and runs local vector search (cosine similarity via `all-MiniLM-L6-v2`) to semantically match. No API calls, no subprocess forks. Matched content is injected into context.
 2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it as a script (repeatable action) or note (reusable context).
 
-Cache is global (`~/.claude/`) — shared across all projects.
+Cache is global (`~/.claude/`) — shared across all projects. Vector index lives at `~/.claude/.draft-vectors.json` and rebuilds on each save.
 
 ## Install
 
