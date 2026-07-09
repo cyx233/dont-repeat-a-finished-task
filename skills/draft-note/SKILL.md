@@ -1,6 +1,6 @@
 ---
 description: "Save a note to the DRAFT cache (reusable context, not a script)"
-argument-hint: "[--name <name>] [--global]"
+argument-hint: "[--name <name>]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
@@ -15,7 +15,7 @@ Save reusable context as a note. Notes cache knowledge that stays stable across 
    - If a note with the same name exists → read it, show diff, update in-place (Edit)
    - If no conflict → proceed to create new file
 3. Extract from conversation: core fact, constraints, scope.
-4. Write to `.claude/notes/<name>.md`:
+4. Write to `~/.claude/notes/<name>.md`:
 
 ```markdown
 ---
@@ -29,8 +29,7 @@ description: <one-line summary>
 
 ## Target directory
 
-- `--global` → `~/.claude/notes/` (shared across all projects)
-- default → `.claude/notes/` (project-local)
+Always `~/.claude/notes/` (global, shared across all projects).
 
 Show the note, ask if user wants to edit.
 

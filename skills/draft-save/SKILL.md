@@ -1,6 +1,6 @@
 ---
 description: "Save current session work as a reusable bash/python script"
-argument-hint: "[--name <name>] [--commit <ref>] [--global]"
+argument-hint: "[--name <name>] [--commit <ref>]"
 allowed-tools: ["Bash", "Read", "Write"]
 ---
 
@@ -38,15 +38,11 @@ Pick the language that fits the task. Frontmatter format:
 # @name <name>
 # @description <one line>
 # @param <name> <type> "<description>" [default]
-# @triggers <comma-separated phrases that should match this script>
 ```
-
-- `@triggers`: natural-language phrases the user might type when they want this task done. Used by draft-match to surface the script. Include the obvious verbs and short aliases.
 
 ## Target directory
 
-- `--global` → `~/.claude/scripts/` (shared across all projects)
-- default → `.claude/scripts/` (project-local)
+Always `~/.claude/scripts/` (global, shared across all projects).
 
 Write to `<target>/<name>.<ext>`, `chmod +x`.
 Show the script, ask if user wants to edit.

@@ -6,24 +6,19 @@ const path = require("path");
 const os = require("os");
 
 function getDirs(subdir) {
-  const dirs = [];
-  const local = path.join(process.cwd(), ".claude", subdir);
-  const global = path.join(os.homedir(), ".claude", subdir);
-  if (fs.existsSync(local) && fs.statSync(local).isDirectory()) dirs.push(local);
-  if (fs.existsSync(global) && fs.statSync(global).isDirectory()) dirs.push(global);
-  return dirs;
+  const dir = path.join(os.homedir(), ".claude", subdir);
+  return fs.existsSync(dir) && fs.statSync(dir).isDirectory() ? [dir] : [];
 }
 
 function parseScript(filePath, content) {
   const lines = content.split(/\r?\n/);
-  let name = "", description = "", triggers = "";
+  let name = "", description = "";
   for (const line of lines) {
     if (line.startsWith("# @name ")) { name = line.slice(8); continue; }
     if (line.startsWith("# @description ")) { description = line.slice(15); continue; }
-    if (line.startsWith("# @triggers ")) { triggers = line.slice(12); continue; }
     if (!line.startsWith("#")) break;
   }
-  return name ? { name, path: filePath, description, triggers } : null;
+  return name ? { name, path: filePath, description } : null;
 }
 
 function parseNote(filePath, content) {
@@ -73,8 +68,8 @@ const mode = process.argv[2] || "scripts";
 
 switch (mode) {
   case "--all":
-    for (const s of scanScripts()) process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\n`);
-    for (const n of scanNotes()) process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\t\n`);
+    for (const s of scanScripts()) process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\n`);
+    for (const n of scanNotes()) process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\n`);
     break;
   case "--find": {
     const t = process.argv[3] || "";
