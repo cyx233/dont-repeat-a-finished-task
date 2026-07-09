@@ -76,7 +76,7 @@ npm install @cyx233/draft
 
 ## API
 
-### `forkQueryStrict(prompt, opts?)` — Programmatic `/btw` with guaranteed structured output
+### `forkQueryStrict(prompt, opts?)`
 
 Forks the parent session, asks a side-question, retries on malformed JSON. Returns parsed object or throws.
 
@@ -89,23 +89,9 @@ Forks the parent session, asks a side-question, retries on malformed JSON. Retur
 | `maxRetries` | 2 | Retry on parse failure |
 | `validate` | — | `(parsed) => bool` — custom validation |
 
-### `forkQuery(prompt, opts?)`
-
-Same as above but without retry/validation. Returns parsed JSON or raw string.
-
-### `query(prompt, opts?)`
-
-Cold-start one-shot (no context reuse). For hosts without `--fork-session` support.
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `schema` | — | JSON Schema → structured output |
-| `timeout` | 15000 | ms |
-| `host` | auto | `'claude'` \| `'codex'` \| `'gemini'` \| `'q'` |
-
 ### `detectHost()`
 
-Returns the first available host CLI, or `null`.
+Returns `'claude'` if CLI is available, otherwise `null`.
 
 ## Commands
 
