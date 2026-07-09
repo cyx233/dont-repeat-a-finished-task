@@ -1,6 +1,6 @@
 {
   "name": "@cyx233/draft",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Agent injection hooks + task caching for AI coding agents",
   "keywords": ["agent-hook", "claude-code", "plugin", "caching"],
   "license": "MIT",

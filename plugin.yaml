@@ -1,5 +1,5 @@
 name: draft
-version: 0.5.0
+version: 1.0.0
 description: "Agent injection hooks + task caching for AI coding agents"
 author: cyx233
 provides_hooks:
