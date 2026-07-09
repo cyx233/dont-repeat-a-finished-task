@@ -18,5 +18,5 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/lib/scan.js" --find-any "$ARGUMENTS"
 4. `rm <path>`
 5. Remove from vector index:
 ```!
-node -e "const fs=require('fs'),p=require('os').homedir()+'/.claude/.draft-vectors.json';try{const v=JSON.parse(fs.readFileSync(p,'utf8'));delete v['$ARGUMENTS'];fs.writeFileSync(p,JSON.stringify(v))}catch{}"
+node -e "const fs=require('fs'),d=require('os').homedir()+'/.claude/.draft-vectors',p=d+'/index.json';try{const idx=JSON.parse(fs.readFileSync(p,'utf8'));delete idx['$ARGUMENTS'];fs.writeFileSync(p,JSON.stringify(idx))}catch{}"
 ```
