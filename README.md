@@ -2,8 +2,6 @@
 
 <p align="center"><em>Don't Repeat A Finished Task</em></p>
 
-<p align="center">Task caching plugin for Claude Code</p>
-
 <p align="center">
   <img src="https://img.shields.io/npm/v/@cyx233/draft?style=flat-square" alt="npm">
   <img src="https://img.shields.io/github/stars/cyx233/dont-repeat-a-finished-task?style=flat-square" alt="Stars">
@@ -27,7 +25,7 @@ Scripts and notes live in `~/.claude/scripts/` and `~/.claude/notes/` — shared
 
 ## How It Works
 
-1. **On prompt** — a `UserPromptSubmit` hook scans your cache, uses a lightweight LLM fork to semantically match, and injects relevant scripts/notes into context.
+1. **On prompt** — a `UserPromptSubmit` hook scans your cache and uses **programmatic `/btw`** (`claude --resume <session> --fork-session -p`) to semantically match. The fork shares the parent session's KV cache — no cold start, no history pollution. Matched scripts/notes are injected into context.
 2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it.
 
 ## Install
