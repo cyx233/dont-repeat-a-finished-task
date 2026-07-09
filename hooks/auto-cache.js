@@ -2,7 +2,7 @@
 "use strict";
 
 const fs = require('fs');
-const { parseInput, getCacheMode } = require('./draft-runtime');
+const { parseInput, getCacheMode, emit } = require('./draft-runtime');
 
 parseInput().then(data => {
   if (getCacheMode(data.cwd) === 'never') process.exit(0);
@@ -18,6 +18,5 @@ parseInput().then(data => {
   }
 
   const mode = getCacheMode(data.cwd);
-  process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
-  process.exit(2);
+  emit('Stop', `Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}`);
 }).catch(() => process.exit(0));
