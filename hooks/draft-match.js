@@ -26,9 +26,10 @@ parseInput().then(data => {
   // Fork: needs session context for ambiguous prompts ("repeat", "again", etc.)
   const catalog = items.map(m => `${m.name} (${m.type}): ${m.desc}`).join('\n');
   const result = forkQueryStrict(
-    `You are the DRAFT matcher. Match by semantic intent, not keyword overlap. When uncertain, do NOT include. Return ONLY valid JSON, no markdown.\n\nUser task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn {"matches": ["name1"]} or {"matches": []}`,
+    `User task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn names of items that match this task. JSON only: {"matches": ["name1"]}`,
     {
       sessionId: data.session_id,
+      agent: 'draft-matcher',
       timeout: 12000,
       validate: r => Array.isArray(r && r.matches),
     }

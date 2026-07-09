@@ -10,3 +10,6 @@ provides_skills:
   - draft-note
   - draft-rm
   - draft-auto-cache
+provides_agents:
+  - draft-matcher
+  - draft-evaluator
