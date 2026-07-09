@@ -39,8 +39,7 @@ parseInput().then(data => {
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
-  } catch (e) {
-    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, stdout: (e.stdout || '').toString().slice(0, 1000) }));
+  } catch {
     process.exit(0);
   }
 
