@@ -6,6 +6,7 @@ const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime
 const { forkQueryStrict, detectHost } = require('../lib/agent-hook');
 
 parseInput().then(data => {
+  fs.writeFileSync('/tmp/draft-debug.json', JSON.stringify(data, null, 2));
   const prompt = (data.user_prompt || data.prompt || '').trim();
   if (!prompt) process.exit(0);
 
