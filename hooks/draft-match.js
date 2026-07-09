@@ -31,6 +31,7 @@ parseInput().then(data => {
       sessionId: data.session_id,
       agent: 'draft-matcher',
       timeout: 12000,
+      cwd: data.cwd,
       validate: r => Array.isArray(r && r.matches),
     }
   );
