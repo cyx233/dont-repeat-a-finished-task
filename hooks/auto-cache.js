@@ -39,10 +39,12 @@ parseInput().then(data => {
         validate: r => r && typeof r.cache === 'boolean',
       }
     );
-  } catch {
+  } catch (e) {
+    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, code: e.status }));
     process.exit(0);
   }
 
+  fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'result', decision }));
   if (!decision || !decision.cache) process.exit(0);
 
   // Decision made — now hand off to main agent for execution via exit 2
