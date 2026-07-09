@@ -13,17 +13,8 @@ parseInput().then(data => {
   // Gate: skip if session too short
   if (data.transcript_path) {
     try {
-      const markFile = path.join(require('os').tmpdir(), `draft-offset-${data.session_id || process.ppid}`);
-      let offset = 0;
-      try { offset = parseInt(fs.readFileSync(markFile, 'utf8')) || 0; } catch {}
-      const fd = fs.openSync(data.transcript_path, 'r');
-      const size = fs.fstatSync(fd).size;
-      if (size <= offset) { fs.closeSync(fd); process.exit(0); }
-      const buf = Buffer.alloc(size - offset);
-      fs.readSync(fd, buf, 0, buf.length, offset);
-      fs.closeSync(fd);
-      const turns = (buf.toString('utf8').match(/"type":"assistant"/g) || []).length;
-      fs.writeFileSync(markFile, String(size));
+      const content = fs.readFileSync(data.transcript_path, 'utf8');
+      const turns = (content.match(/"type":"assistant"/g) || []).length;
       if (turns < 3) process.exit(0);
     } catch {}
   }
