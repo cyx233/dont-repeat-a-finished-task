@@ -26,6 +26,7 @@ parseInput().then(async data => {
 
   if (!depInstalled()) {
     emit('UserPromptSubmit',
+      'IMPORTANT: You MUST inform the user of the following before answering their question.\n' +
       'DRAFT: Embedding model not yet installed. Run this once to enable semantic matching:\n```\ncd "' +
       path.resolve(__dirname, '..') + '" && npm install --omit=dev\n```');
     process.exit(0);
