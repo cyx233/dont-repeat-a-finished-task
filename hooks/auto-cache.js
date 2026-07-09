@@ -40,11 +40,10 @@ parseInput().then(data => {
       }
     );
   } catch (e) {
-    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, code: e.status, stderr: (e.stderr || '').toString().slice(0, 500), cwd: data.cwd, sessionId: data.session_id }));
+    fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'catch', error: e.message, stdout: (e.stdout || '').toString().slice(0, 1000) }));
     process.exit(0);
   }
 
-  fs.writeFileSync('/tmp/draft-auto-cache-debug.json', JSON.stringify({ stage: 'result', decision }));
   if (!decision || !decision.cache) process.exit(0);
 
   // Decision made — now hand off to main agent for execution via exit 2
