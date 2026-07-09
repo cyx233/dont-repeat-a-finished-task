@@ -3,9 +3,10 @@
 
 const fs = require('fs');
 const { scanCatalog, parseInput, setCacheMode, emit } = require('./draft-runtime');
-const { forkQueryStrict, detectHost, getSessionCwd } = require('../lib/agent-hook');
+const { matchByVector } = require('../lib/embedder');
+const { getSessionCwd } = require('../lib/agent-hook');
 
-parseInput().then(data => {
+parseInput().then(async data => {
   const prompt = (data.user_prompt || data.prompt || '').trim();
   if (!prompt) process.exit(0);
 
@@ -16,30 +17,10 @@ parseInput().then(data => {
   const items = scanCatalog(getSessionCwd({ transcriptPath: data.transcript_path }) || data.cwd);
   if (!items.length) process.exit(0);
 
-  if (!detectHost()) {
-    const lines = items.map(m => `- ${m.name} (${m.type}): ${m.desc} → ${m.path}`);
-    emit('UserPromptSubmit', `DRAFT CATALOG:\n${lines.join('\n')}\nUse matching items instead of re-implementing.`);
-    process.exit(0);
-  }
-
-  // Fork: focused LLM judgment with session context
-  const catalog = items.map(m => `${m.name} (${m.type}): ${m.desc}`).join('\n');
-  const result = forkQueryStrict(
-    `User task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn names of items that match this task. JSON only: {"matches": ["name1"]}`,
-    {
-      sessionId: data.session_id,
-      agent: 'draft-matcher',
-      timeout: 45000,
-      transcriptPath: data.transcript_path,
-      validate: r => Array.isArray(r && r.matches),
-    }
-  );
-
-  const names = (result && result.matches) || [];
+  const names = await matchByVector(prompt, items) || [];
   const matched = items.filter(m => names.includes(m.name));
   if (!matched.length) process.exit(0);
 
-  // Inject matched script/note content
   const sections = matched.map(m => {
     const content = fs.readFileSync(m.path, 'utf8');
     const cmd = m.type === 'script' ? `bash "${m.path}"` : '(note)';
