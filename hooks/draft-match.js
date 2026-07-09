@@ -23,13 +23,12 @@ parseInput().then(data => {
     process.exit(0);
   }
 
-  // Fork hack: sub-agent with parent context, structured output + retry
+  // Fork hack: inline prompt (no --agent) to preserve parent cache prefix
   const catalog = items.map(m => `${m.name} (${m.type}): ${m.desc}`).join('\n');
   const result = forkQueryStrict(
-    `User task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn names of items that match this task. JSON only: {"matches": ["name1"]}`,
+    `You are the DRAFT matcher. Match by semantic intent, not keyword overlap. When uncertain, do NOT include. Return ONLY valid JSON, no markdown.\n\nUser task: "${prompt}"\n\nCatalog:\n${catalog}\n\nReturn {"matches": ["name1"]} or {"matches": []}`,
     {
       sessionId: data.session_id,
-      agent: 'draft-matcher',
       timeout: 12000,
       validate: r => Array.isArray(r && r.matches),
     }

@@ -27,14 +27,13 @@ parseInput().then(data => {
     process.exit(2);
   }
 
-  // Fork hack: sub-agent evaluates cacheability using full session context
+  // Fork hack: inline prompt (no --agent) to preserve parent cache prefix
   let decision;
   try {
     decision = forkQueryStrict(
-      'Review this session. Is the work worth caching as a reusable script or note? JSON only.',
+      'You are the DRAFT evaluator. Decide if this session produced cacheable work (repeatable scripts or reusable context notes). NOT cacheable: one-off Q&A, trivial config, mode toggling, already-cached work replay. When uncertain return cache:false. Return ONLY valid JSON: {"cache":true,"type":"script"|"note","name":"kebab-name","description":"one line"} or {"cache":false}',
       {
         sessionId: data.session_id,
-        agent: 'draft-evaluator',
         timeout: 12000,
         validate: r => r && typeof r.cache === 'boolean',
       }

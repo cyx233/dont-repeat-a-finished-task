@@ -26,8 +26,8 @@ const { forkQueryStrict } = require('@cyx233/draft');
 // Inside a hook: ask the parent session a side-question
 // Full context visible, doesn't pollute conversation history
 const result = forkQueryStrict(
-  'Which cached scripts match this user task?',
-  { sessionId: data.session_id, agent: 'draft-matcher' }
+  'You are the DRAFT matcher. User task: "set up eslint". Catalog: eslint-setup (script): Set up ESLint. Return {"matches":["name"]} or {"matches":[]}',
+  { sessionId: data.session_id }
 );
 // result = { matches: ["eslint-setup"] }
 ```
