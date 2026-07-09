@@ -2,6 +2,5 @@
   "name": "draft",
   "version": "0.5.0",
   "description": "Agent injection hooks + task caching for AI coding agents",
-  "author": { "name": "cyx233", "url": "https://github.com/cyx233" },
-  "hooks": "./hooks/hooks.json"
+  "author": { "name": "cyx233", "url": "https://github.com/cyx233" }
 }

@@ -54,30 +54,4 @@ function setCacheMode(mode, cwd) {
   fs.writeFileSync(f, JSON.stringify(modes));
 }
 
-function autoCache() {
-  parseInput().then(data => {
-    if (getCacheMode(data.cwd) === 'never') process.exit(0);
-    if (data.stop_hook_active) process.exit(0);
-    if (data.transcript_path) {
-      try {
-        const markFile = path.join(require('os').tmpdir(), `draft-offset-${data.session_id || process.ppid}`);
-        let offset = 0;
-        try { offset = parseInt(fs.readFileSync(markFile, 'utf8')) || 0; } catch {}
-        const fd = fs.openSync(data.transcript_path, 'r');
-        const size = fs.fstatSync(fd).size;
-        if (size <= offset) { fs.closeSync(fd); process.exit(0); }
-        const buf = Buffer.alloc(size - offset);
-        fs.readSync(fd, buf, 0, buf.length, offset);
-        fs.closeSync(fd);
-        const turns = (buf.toString('utf8').match(/"type":"assistant"/g) || []).length;
-        fs.writeFileSync(markFile, String(size));
-        if (turns < 3) process.exit(0);
-      } catch {}
-    }
-    const mode = getCacheMode(data.cwd);
-    process.stderr.write(`Invoke /draft-auto-cache --mode ${mode === 'always' ? 'always' : 'ask'}\n`);
-    process.exit(2);
-  }).catch(() => process.exit(0));
-}
-
-module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode, autoCache };
+module.exports = { emit, scanCatalog, parseInput, getCacheMode, setCacheMode };
