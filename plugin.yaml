@@ -1,16 +1,10 @@
 name: draft
-version: 0.3.0
-description: "Don't Repeat A Finished Task — caching layer for agent workflows (scripts + notes)"
+version: 0.4.0
+description: "Agent injection hooks + task caching for AI coding agents"
 author: cyx233
 provides_hooks:
-  - SessionStart
   - UserPromptSubmit
-  - SubagentStart
   - Stop
-provides_commands:
-  - draft-save
-  - draft-note
-  - draft-rm
 provides_skills:
   - draft-save
   - draft-note

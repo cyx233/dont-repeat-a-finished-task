@@ -2,4 +2,3 @@ node_modules/
 .DS_Store
 *.log
 .claude/.draft-cache-mode
-.claude/.draft-cache-offset

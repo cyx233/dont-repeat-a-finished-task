@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Node.js equivalent of scan.sh — cross-platform scanner for @draft scripts and notes
 "use strict";
 
 const fs = require("fs");
@@ -15,64 +14,40 @@ function getDirs(subdir) {
   return dirs;
 }
 
-function parseScriptFrontmatter(filePath, content) {
+function parseScript(filePath, content) {
   const lines = content.split(/\r?\n/);
-  let name = "";
-  let description = "";
-  let triggers = "";
-
-  const params = [];
-
+  let name = "", description = "", triggers = "";
   for (const line of lines) {
-    if (line === "# @draft") continue;
-    if (line.startsWith("# @name ")) { name = line.slice("# @name ".length); continue; }
-    if (line.startsWith("# @description ")) { description = line.slice("# @description ".length); continue; }
-    if (line.startsWith("# @triggers ")) { triggers = line.slice("# @triggers ".length); continue; }
-    if (line.startsWith("# @param ")) {
-      const m = line.match(/^# @param (\S+)\s+(\S+)\s+"([^"]*)"\s*(.*)?$/);
-      if (m) params.push({ name: m[1], type: m[2], desc: m[3], default: (m[4] || '').trim() });
-      continue;
-    }
-    if (line.startsWith("#!")) continue;
-    if (line.startsWith("#")) continue;
-    break;
+    if (line.startsWith("# @name ")) { name = line.slice(8); continue; }
+    if (line.startsWith("# @description ")) { description = line.slice(15); continue; }
+    if (line.startsWith("# @triggers ")) { triggers = line.slice(12); continue; }
+    if (!line.startsWith("#")) break;
   }
-
-  if (name) return { name, path: filePath, description, triggers, params };
-  return null;
+  return name ? { name, path: filePath, description, triggers } : null;
 }
 
-function parseNoteFrontmatter(filePath, content) {
+function parseNote(filePath, content) {
   const lines = content.split(/\r?\n/);
-  let name = "";
-  let description = "";
-  let inFrontmatter = false;
-
+  let name = "", description = "", inside = false;
   for (const line of lines) {
-    if (line === "---") {
-      if (inFrontmatter) break;
-      inFrontmatter = true;
-      continue;
-    }
-    if (inFrontmatter) {
-      if (line.startsWith("name: ")) name = line.slice("name: ".length);
-      else if (line.startsWith("description: ")) description = line.slice("description: ".length);
+    if (line === "---") { if (inside) break; inside = true; continue; }
+    if (inside) {
+      if (line.startsWith("name: ")) name = line.slice(6);
+      else if (line.startsWith("description: ")) description = line.slice(13);
     }
   }
-
-  if (name) return { name, path: filePath, description };
-  return null;
+  return name ? { name, path: filePath, description } : null;
 }
 
 function scanScripts() {
   const results = [];
   for (const dir of getDirs("scripts")) {
     for (const entry of fs.readdirSync(dir)) {
-      const filePath = path.join(dir, entry);
-      if (!fs.statSync(filePath).isFile()) continue;
-      const content = fs.readFileSync(filePath, "utf8");
+      const fp = path.join(dir, entry);
+      if (!fs.statSync(fp).isFile()) continue;
+      const content = fs.readFileSync(fp, "utf8");
       if (!content.slice(0, 300).includes("@draft")) continue;
-      const parsed = parseScriptFrontmatter(filePath, content);
+      const parsed = parseScript(fp, content);
       if (parsed) results.push(parsed);
     }
   }
@@ -83,75 +58,41 @@ function scanNotes() {
   const results = [];
   for (const dir of getDirs("notes")) {
     for (const entry of fs.readdirSync(dir)) {
-      const filePath = path.join(dir, entry);
-      if (!fs.statSync(filePath).isFile()) continue;
-      const content = fs.readFileSync(filePath, "utf8");
+      const fp = path.join(dir, entry);
+      if (!fs.statSync(fp).isFile()) continue;
+      const content = fs.readFileSync(fp, "utf8");
       if (!content.slice(0, 300).includes("draft: note")) continue;
-      const parsed = parseNoteFrontmatter(filePath, content);
+      const parsed = parseNote(fp, content);
       if (parsed) results.push(parsed);
     }
   }
   return results;
 }
 
-// CLI
-const args = process.argv.slice(2);
-const mode = args[0] || "scripts";
+const mode = process.argv[2] || "scripts";
 
 switch (mode) {
   case "--all":
-    for (const s of scanScripts()) {
-      const paramStr = (s.params || []).map(p => `${p.name}${p.default ? `=${p.default}` : ''}: ${p.desc}`).join('; ');
-      process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\t${paramStr}\n`);
-    }
-    for (const n of scanNotes()) {
-      process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\t\n`);
-    }
+    for (const s of scanScripts()) process.stdout.write(`script\t${s.name}\t${s.path}\t${s.description}\t${s.triggers || ''}\n`);
+    for (const n of scanNotes()) process.stdout.write(`note\t${n.name}\t${n.path}\t${n.description}\t\n`);
     break;
-
-  case "--notes":
-    for (const n of scanNotes()) {
-      process.stdout.write(`${n.name}\t${n.path}\t${n.description}\n`);
-    }
-    break;
-
   case "--find": {
-    const target = args[1] || "";
-    for (const s of scanScripts()) {
-      if (s.name === target) {
-        process.stdout.write(s.path + "\n");
-        process.exit(0);
-      }
-    }
+    const t = process.argv[3] || "";
+    for (const s of scanScripts()) { if (s.name === t) { process.stdout.write(s.path + "\n"); process.exit(0); } }
     process.exit(1);
   }
-
   case "--find-note": {
-    const target = args[1] || "";
-    for (const n of scanNotes()) {
-      if (n.name === target) {
-        process.stdout.write(n.path + "\n");
-        process.exit(0);
-      }
-    }
+    const t = process.argv[3] || "";
+    for (const n of scanNotes()) { if (n.name === t) { process.stdout.write(n.path + "\n"); process.exit(0); } }
     process.exit(1);
   }
-
   case "--find-any": {
-    const target = args[1] || "";
-    for (const s of scanScripts()) {
-      if (s.name === target) { process.stdout.write(`script\t${s.path}\n`); process.exit(0); }
-    }
-    for (const n of scanNotes()) {
-      if (n.name === target) { process.stdout.write(`note\t${n.path}\n`); process.exit(0); }
-    }
+    const t = process.argv[3] || "";
+    for (const s of scanScripts()) { if (s.name === t) { process.stdout.write(`script\t${s.path}\n`); process.exit(0); } }
+    for (const n of scanNotes()) { if (n.name === t) { process.stdout.write(`note\t${n.path}\n`); process.exit(0); } }
     process.exit(1);
   }
-
   default:
-    // No flag = list scripts
-    for (const s of scanScripts()) {
-      process.stdout.write(`${s.name}\t${s.path}\t${s.description}\n`);
-    }
+    for (const s of scanScripts()) process.stdout.write(`${s.name}\t${s.path}\t${s.description}\n`);
     break;
 }

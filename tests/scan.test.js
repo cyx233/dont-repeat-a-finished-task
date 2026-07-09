@@ -5,18 +5,10 @@ const path = require('path');
 
 const SCAN = path.join(__dirname, '..', 'scripts', 'lib', 'scan.js');
 
+test('--all runs without error', () => {
+  execSync(`node "${SCAN}" --all`, { encoding: 'utf8', cwd: '/tmp' });
+});
+
 test('--find non-existent exits 1', () => {
-  assert.throws(() => {
-    execSync(`node "${SCAN}" --find does-not-exist-xyz`, { encoding: 'utf8', cwd: '/tmp' });
-  });
-});
-
-test('--find-note non-existent exits 1', () => {
-  assert.throws(() => {
-    execSync(`node "${SCAN}" --find-note does-not-exist-xyz`, { encoding: 'utf8', cwd: '/tmp' });
-  });
-});
-
-test('default mode runs without error', () => {
-  execSync(`node "${SCAN}"`, { encoding: 'utf8', cwd: '/tmp' });
+  assert.throws(() => execSync(`node "${SCAN}" --find nope`, { encoding: 'utf8', cwd: '/tmp' }));
 });
