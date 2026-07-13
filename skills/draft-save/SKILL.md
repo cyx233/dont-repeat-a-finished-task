@@ -45,8 +45,4 @@ Pick the language that fits the task. Frontmatter format:
 Always `~/.claude/scripts/` (global, shared across all projects).
 
 Write to `<target>/<name>.<ext>`, `chmod +x`.
-Rebuild the vector index (pass the name and description of the saved script):
-```!
-node "${CLAUDE_PLUGIN_ROOT}/lib/build-vectors.js" "<name>" "<description>"
-```
 Show the script, ask if user wants to edit.

@@ -16,17 +16,19 @@ You solved a task once. The agent remembers. Next time it matches, the cached sc
 
 ```
 You: "set up ESLint"
-  → Hook matches cached "eslint-setup"
-  → Injects script into context
+  → draft-match skill finds cached "eslint-setup"
+  → Agent runs the cached script
   → Done. 2 seconds, not 45.
 ```
 
 ## How It Works
 
-1. **On prompt** — a `UserPromptSubmit` hook scans `~/.claude/{scripts,notes}/` and runs local vector search (cosine similarity via `all-MiniLM-L6-v2`) to semantically match. No API calls, no subprocess forks. Matched content is injected into context.
-2. **On stop** — a `Stop` hook evaluates whether the session produced cacheable work and offers to save it as a script (repeatable action) or note (reusable context).
+1. **When a task starts** — the `draft-match` skill scans `~/.claude/{scripts,notes}/` and the agent matches the task against the cached names and descriptions. Matched scripts/notes are used instead of re-implementing.
+2. **When work wraps up** — the `/draft-auto-cache` skill evaluates whether the session produced cacheable work and offers to save it as a script (repeatable action) or note (reusable context).
 
-Cache is global (`~/.claude/`) — shared across all projects. Vector index lives at `~/.claude/.draft-vectors/` and rebuilds incrementally on each save.
+These are model-triggered skills, not hooks — the agent invokes them based on their descriptions, so triggering is not guaranteed automatic. You can always invoke `/draft-match` or `/draft-auto-cache` explicitly.
+
+Cache is global (`~/.claude/`) — shared across all projects.
 
 ## Install
 
@@ -41,16 +43,12 @@ Cache is global (`~/.claude/`) — shared across all projects. Vector index live
 
 (Two separate prompts.)
 
-On first use, the plugin will prompt you to install the embedding model. Or run manually:
-
-```
-cd ~/.claude/plugins/cache/dont-repeat-a-finished-task/draft/*/  && npm run setup
-```
-
 ## Commands
 
 | Command | Description |
 |---------|-------------|
+| `/draft-match` | Check the cache for scripts/notes matching the current task |
+| `/draft-auto-cache` | Evaluate and offer to cache this session's work |
 | `/draft-save` | Save session work as a reusable script |
 | `/draft-note` | Save context as a reusable note |
 | `/draft-rm` | Delete a cached item |

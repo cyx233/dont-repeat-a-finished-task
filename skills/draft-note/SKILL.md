@@ -31,10 +31,6 @@ description: <one-line summary>
 
 Always `~/.claude/notes/` (global, shared across all projects).
 
-Rebuild the vector index (pass the name and description of the saved note):
-```!
-node "${CLAUDE_PLUGIN_ROOT}/lib/build-vectors.js" "<name>" "<description>"
-```
 Show the note, ask if user wants to edit.
 
 ## Rules
